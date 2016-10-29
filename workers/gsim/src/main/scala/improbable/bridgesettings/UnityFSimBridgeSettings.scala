@@ -5,15 +5,14 @@ import improbable.fapi.network.MultiplexTcpLinkSettings
 import improbable.unity.fabric.AuthoritativeEntityOnly
 import improbable.unity.fabric.bridge.FSimAssetContextDiscriminator
 import improbable.unity.fabric.engine.EnginePlatform
-import improbable.unity.fabric.satisfiers.SatisfyPhysics
 
 object SharpBridgeSettings extends BridgeSettingsResolver {
 
   private val sharpEngineBridgeSettings = BridgeSettings(
     FSimAssetContextDiscriminator(),
     MultiplexTcpLinkSettings(),
-    EnginePlatform.UNITY_FSIM_ENGINE,
-    SatisfyPhysics,
+    "yoloEnginePlatform",//EnginePlatform.UNITY_FSIM_ENGINE,
+    YoloWorkerConstraintSatisfier,
     AuthoritativeEntityOnly(),
     MetricsEngineLoadPolicy,
     PerEntityOrderedStateUpdateQos
@@ -27,3 +26,10 @@ object SharpBridgeSettings extends BridgeSettingsResolver {
     }
   }
 }
+
+import improbable.fapi.engine.ProtoEngineConstraintSatisfier
+import improbable.papi.engine.EngineConstraints
+
+case object YoloWorkerConstraintSatisfier extends ProtoEngineConstraintSatisfier(
+  EngineConstraints.makeClaim(EngineConstraints.makeAtom("yolo"))
+)

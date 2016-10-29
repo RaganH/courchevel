@@ -11,6 +11,52 @@
     
 // Generated from: improbable/player/name.proto
 // Note: requires additional types generated from: improbable/entity_state.proto
-namespace Schema.Improbable.Player
+namespace Schema.Ragan
 {
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"HealthData")]
+  public partial class HealthData : global::ProtoBuf.IExtensible
+  {
+    public HealthData() {}
+    
+
+    private uint? _currentHealth;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"current_health", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint CurrentHealth
+    {
+      get { return _currentHealth?? default(uint); }
+      set { _currentHealth = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool CurrentHealthSpecified
+    {
+      get { return _currentHealth != null; }
+      set { if (value == (_currentHealth== null)) _currentHealth = value ? CurrentHealth : (uint?)null; }
+    }
+    private bool ShouldSerializeCurrentHealth() { return CurrentHealthSpecified; }
+    private void ResetCurrentHealth() { CurrentHealthSpecified = false; }
+    
+
+    private uint? _maxHealth;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"max_health", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint MaxHealth
+    {
+      get { return _maxHealth?? default(uint); }
+      set { _maxHealth = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool MaxHealthSpecified
+    {
+      get { return _maxHealth != null; }
+      set { if (value == (_maxHealth== null)) _maxHealth = value ? MaxHealth : (uint?)null; }
+    }
+    private bool ShouldSerializeMaxHealth() { return MaxHealthSpecified; }
+    private void ResetMaxHealth() { MaxHealthSpecified = false; }
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
 }

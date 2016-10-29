@@ -5,6 +5,7 @@ import improbable.dapi.LaunchConfig
 import improbable.fapi.bridge.CompositeBridgeSettingsResolver
 import improbable.papi.worldapp.WorldApp
 import improbable.unity.fabric.engine.DownloadableUnityConstraintToEngineDescriptorResolver
+import ragan.PlayerSpawner
 
 /**
   * These are the engine startup configs.
@@ -20,7 +21,7 @@ object AutomaticWorkerStartup extends SimulationLaunchConfigWithApps(dynamically
   * Use this class to specify the list of apps you want to run when the game starts.
   */
 class SimulationLaunchConfigWithApps(dynamicallySpoolUpWorkers: Boolean) extends
-  SimulationLaunchConfig(appsToStart = Seq.empty, dynamicallySpoolUpWorkers)
+  SimulationLaunchConfig(appsToStart = Seq(classOf[PlayerSpawner]), dynamicallySpoolUpWorkers)
 
 class SimulationLaunchConfig(appsToStart: Seq[Class[_ <: WorldApp]],
                              dynamicallySpoolUpWorkers: Boolean) extends LaunchConfig(
