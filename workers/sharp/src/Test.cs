@@ -24,9 +24,18 @@ class Test
 
         var connection = new Connection(hostname, 7777, parameters);
 
-        RunEventLoop(connection, new Dispatcher());
+        var dispatcher = new Dispatcher();
+
+        dispatcher.OnAddEntity(o => DoAThing(connection, o));
+
+        RunEventLoop(connection, dispatcher);
 
         return 0;
+    }
+
+    private static void DoAThing(Connection conn, AddEntityOp obj)
+    {
+        conn.SendLogMessage(LogLevel.Warn, "MyWorkerLogger", string.Format("Entity {0} created on worker!!", obj.EntityId));
     }
 
     const int FramesPerSecond = 60;

@@ -3,15 +3,12 @@ package ragan
 import java.io.File
 import java.nio.file.Path
 
-import improbable.corelib.natures.{BaseNature, NatureApplication, NatureDescription}
-import improbable.fapi.engine.{DownloadableEngineDescriptor, EngineStartConfig}
-import improbable.papi.engine.EnginePlatform
-import improbable.papi.entity.EntityPrefab
-import improbable.papi.entity.behaviour.EntityBehaviourDescriptor
+import improbable.fapi.engine.{DownloadableEngineDescriptor, EngineStartConfig, ProtoEngineConstraintSatisfier}
+import improbable.papi.engine.{EngineConstraints, EnginePlatform, ProtoEngineConstraint}
 
 case class MyWorkerDescriptor() extends DownloadableEngineDescriptor {
   override def startCommand(config: EngineStartConfig, enginePath: Path): Seq[String] = {
-    Seq(makeExecutablePath(enginePath), "foo worker", config.receptionistIp)
+    Seq(makeExecutablePath(enginePath), "foo_worker", config.receptionistIp)
   }
 
   private def makeExecutablePath(startPath: Path): String = {
@@ -26,12 +23,13 @@ case class MyWorkerDescriptor() extends DownloadableEngineDescriptor {
   }
 
   override def enginePlatform: EnginePlatform = {
-    return "trololol"
+    return "CsharpWorkerName"
   }
 }
-
-import improbable.papi.engine.{EngineConstraints, ProtoEngineConstraint}
 
 case object YoloConstraint extends
   ProtoEngineConstraint(EngineConstraints.makePredicate("yolo"))
 
+case object YoloWorkerConstraintSatisfier extends ProtoEngineConstraintSatisfier(
+  EngineConstraints.makeClaim(EngineConstraints.makeAtom("yolo"))
+)
