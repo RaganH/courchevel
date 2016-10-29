@@ -1,0 +1,65 @@
+{
+  "Tasks": [
+    {
+      "Name": "Codegen",
+      "Steps": [
+        {
+          "Name": "Dependencies",
+          "Arguments": ["worker_package", "unpack"]
+        },
+        {
+          "Name": "C#",
+          "Arguments": ["process_schema", "--use_worker_defaults", "--output", "improbable/generated", "--language", "csharp"]
+        }
+      ]
+    },
+    {
+      "Name": "Build",
+      "Steps": [
+        {
+          "Name": "Codegen",
+          "Arguments": ["exec", "Codegen"]
+        },
+        {
+          "Name": "Linux",
+          "Command": "xbuild",
+          "Arguments": ["/p:Configuration=Release", "/p:Platform=Linux64", "CsharpWorker.sln"]
+        },
+        {
+          "Name": "macOS",
+          "Command": "xbuild",
+          "Arguments": ["/p:Configuration=Release", "/p:Platform=macOS64", "CsharpWorker.sln"]
+        },
+        {
+          "Name": "Windows",
+          "Command": "xbuild",
+          "Arguments": ["/p:Configuration=Release", "/p:Platform=Windows64", "CsharpWorker.sln"]
+        }
+      ]
+    },
+    {
+      "Name": "Clean",
+      "Steps": [
+        {
+          "Name": "Windows",
+          "Command": "xbuild",
+          "Arguments": ["/t:Clean", "/p:Configuration=Release", "/p:Platform=Windows64", "CsharpWorker.sln"]
+        },
+        {
+          "Name": "Linux",
+          "Command": "xbuild",
+          "Arguments": ["/t:Clean", "/p:Configuration=Release", "/p:Platform=Linux64", "CsharpWorker.sln"]
+        },
+        {
+          "Name": "macOS",
+          "Command": "xbuild",
+          "Arguments": ["/t:Clean", "/p:Configuration=Release", "/p:Platform=macOS64", "CsharpWorker.sln"]
+        },
+        {
+          "Name": "Dependencies",
+          "Arguments": ["worker_package", "clean"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "build_type": "csharp",
+  "generate_build_scripts": true
+}

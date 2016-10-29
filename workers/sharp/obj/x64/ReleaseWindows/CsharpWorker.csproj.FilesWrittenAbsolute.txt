@@ -1,0 +1,10 @@
+c:\Users\Harry\Projects\WorldSim\workers\sharp\obj\x64\ReleaseWindows\.NETFramework,Version=v4.5.2.AssemblyAttribute.cs
+c:\Users\Harry\Projects\WorldSim\workers\sharp\bin\x64\ReleaseWindows\WorkerSdkDll.dll
+c:\Users\Harry\Projects\WorldSim\workers\sharp\bin\x64\ReleaseWindows\CsharpWorkerName.exe.mdb
+c:\Users\Harry\Projects\WorldSim\workers\sharp\bin\x64\ReleaseWindows\CsharpWorkerName.exe
+c:\Users\Harry\Projects\WorldSim\workers\sharp\obj\x64\ReleaseWindows\CsharpWorkerName.exe
+c:\Users\Harry\Projects\WorldSim\workers\sharp\obj\x64\ReleaseWindows\CsharpWorkerName.exe.mdb
+c:\Users\Harry\Projects\WorldSim\workers\sharp\bin\x64\ReleaseWindows\Improbable.WorkerSdkCsharp.dll
+c:\Users\Harry\Projects\WorldSim\workers\sharp\bin\x64\ReleaseWindows\protobuf-net.dll
+c:\Users\Harry\Projects\WorldSim\workers\sharp\bin\x64\ReleaseWindows\GeneratedCode.dll
+c:\Users\Harry\Projects\WorldSim\workers\sharp\bin\x64\ReleaseWindows\GeneratedCode.dll.mdb
