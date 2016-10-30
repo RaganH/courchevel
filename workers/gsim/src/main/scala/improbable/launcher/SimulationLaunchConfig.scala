@@ -6,16 +6,7 @@ import improbable.fapi.bridge.CompositeBridgeSettingsResolver
 import improbable.fapi.engine.{ConstraintToEngineDescriptorResolver, EngineDescriptor}
 import improbable.papi.engine.EngineConstraint
 import improbable.papi.worldapp.WorldApp
-import improbable.unity.fabric.engine.DownloadableUnityConstraintToEngineDescriptorResolver
 import ragan.{InitialSpawner, SharpConstraint, SharpWorkerDescriptor}
-
-/**
-  * These are the engine startup configs.
-  *
-  * ManualWorkerStartup will not start an engines when you start the game.
-  * AutomaticWorkerStartup will automatically spool up engines as you need them.
-  */
-//object ManualWorkerStartup extends SimulationLaunchConfigWithApps(dynamicallySpoolUpWorkers = false)
 
 object AutomaticWorkerStartup extends SimulationLaunchConfigWithApps(dynamicallySpoolUpWorkers = true)
 
@@ -30,14 +21,13 @@ class SimulationLaunchConfig(appsToStart: Seq[Class[_ <: WorldApp]],
   appsToStart,
   dynamicallySpoolUpWorkers,
   DefaultBridgeSettingsResolver,
-//  DownloadableUnityConstraintToEngineDescriptorResolver,
-  FooDescriptorResolver)
+  SharpDescriptorResolver)
 
 object DefaultBridgeSettingsResolver extends CompositeBridgeSettingsResolver(
   SharpBridgeSettings
 )
 
-object FooDescriptorResolver extends SharpConstraintToEngineDescriptorResolver
+object SharpDescriptorResolver extends SharpConstraintToEngineDescriptorResolver
 
 // TODO(harry) - this was not mentioned in the docs
 class SharpConstraintToEngineDescriptorResolver extends ConstraintToEngineDescriptorResolver {
