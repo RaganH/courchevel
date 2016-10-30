@@ -11,8 +11,9 @@ case class SharpWorkerDescriptor() extends DownloadableEngineDescriptor {
     Seq(makeExecutablePath(enginePath), "SharpWorker", config.receptionistIp)
   }
 
+  // The example of this doesn't fit the rest
   private def makeExecutablePath(startPath: Path): String = {
-    val absoluteExecutablePath = startPath.resolve("main").toAbsolutePath
+    val absoluteExecutablePath = startPath.resolve("SharpWorker.exe").toAbsolutePath
     ensureFileIsExecutable(absoluteExecutablePath.toFile)
     absoluteExecutablePath.toString
   }

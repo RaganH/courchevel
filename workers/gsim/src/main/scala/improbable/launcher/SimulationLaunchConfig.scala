@@ -3,7 +3,6 @@ package improbable.launcher
 import improbable.bridgesettings.SharpBridgeSettings
 import improbable.dapi.LaunchConfig
 import improbable.fapi.bridge.CompositeBridgeSettingsResolver
-import improbable.fapi.engine.EnginePickerStrategy.EnginePickerStrategy
 import improbable.fapi.engine.{ConstraintToEngineDescriptorResolver, EngineDescriptor}
 import improbable.papi.engine.EngineConstraint
 import improbable.papi.worldapp.WorldApp

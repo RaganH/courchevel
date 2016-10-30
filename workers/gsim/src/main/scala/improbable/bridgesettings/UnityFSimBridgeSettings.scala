@@ -20,7 +20,7 @@ object SharpBridgeSettings extends BridgeSettingsResolver {
   )
 
   override def engineTypeToBridgeSettings(engineType: String, metadata: String): Option[BridgeSettings] = {
-    if (engineType == EnginePlatform.UNITY_FSIM_ENGINE) {
+    if (engineType == "SharpWorker") {
       Some(sharpEngineBridgeSettings)
     } else {
       None
