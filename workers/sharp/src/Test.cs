@@ -5,23 +5,25 @@ class Test
 {
     static int Main(string[] args)
     {
+        /*
         if (args.Length < 2)
         {
             return 1;
         }
-
+        */
         var parameters = new ConnectionParameters();
-        parameters.WorkerType = "MyCsharpWorker";
-        parameters.WorkerId = args[0];
+        parameters.WorkerType = "SharpWorker";
+        parameters.WorkerId = "local_worker_yo";//  args[0];
         parameters.Network.ConnectionType = NetworkConnectionType.Tcp;
         parameters.Network.UseExternalIp = false;
 
         var hostname = "localhost";
+        /*
         if (args.Length == 2)
         {
             hostname = args[1];
         }
-
+        */
         var connection = new Connection(hostname, 7777, parameters);
 
         var dispatcher = new Dispatcher();
@@ -44,6 +46,7 @@ class Test
         var nextFrameTime = System.DateTime.Now;
         while (true)
         {
+            connection.SendLogMessage(LogLevel.Warn, "eventLoop", "looping");
             var opList = connection.GetOpList(0 /* non-blocking */);
             // Invoke user-provided callbacks.
             dispatcher.Process(opList);

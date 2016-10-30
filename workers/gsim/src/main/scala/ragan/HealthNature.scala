@@ -16,7 +16,7 @@ object HealthNature extends NatureDescription {
         Health(10, 500)
       ),
       natures = Seq(
-        BaseNature(entityPrefab = EntityPrefab("UNUSED"), isPhysical = false),
+        BaseNature(entityPrefab = EntityPrefab("HealthNature"), isPhysical = false),
         TransformNature()
       )
     )

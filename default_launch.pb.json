@@ -1,6 +1,10 @@
 {
   "javaparams": [
     {
+    	"name": "-DFABRIC_LOG_LEVEL",
+	"value": "WARN"
+    },
+    {
       "name": "-DCLOUD_LAUNCH_CONFIG",
       "value": "improbable.launcher.AutomaticWorkerStartup"
     }

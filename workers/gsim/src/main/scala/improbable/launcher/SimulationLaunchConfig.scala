@@ -3,9 +3,12 @@ package improbable.launcher
 import improbable.bridgesettings.SharpBridgeSettings
 import improbable.dapi.LaunchConfig
 import improbable.fapi.bridge.CompositeBridgeSettingsResolver
+import improbable.fapi.engine.EnginePickerStrategy.EnginePickerStrategy
+import improbable.fapi.engine.{ConstraintToEngineDescriptorResolver, EngineDescriptor}
+import improbable.papi.engine.EngineConstraint
 import improbable.papi.worldapp.WorldApp
 import improbable.unity.fabric.engine.DownloadableUnityConstraintToEngineDescriptorResolver
-import ragan.InitialSpawner
+import ragan.{InitialSpawner, SharpConstraint, SharpWorkerDescriptor}
 
 /**
   * These are the engine startup configs.
@@ -28,8 +31,23 @@ class SimulationLaunchConfig(appsToStart: Seq[Class[_ <: WorldApp]],
   appsToStart,
   dynamicallySpoolUpWorkers,
   DefaultBridgeSettingsResolver,
-  DownloadableUnityConstraintToEngineDescriptorResolver)
+//  DownloadableUnityConstraintToEngineDescriptorResolver,
+  FooDescriptorResolver)
 
 object DefaultBridgeSettingsResolver extends CompositeBridgeSettingsResolver(
   SharpBridgeSettings
 )
+
+object FooDescriptorResolver extends SharpConstraintToEngineDescriptorResolver
+
+// TODO(harry) - this was not mentioned in the docs
+class SharpConstraintToEngineDescriptorResolver extends ConstraintToEngineDescriptorResolver {
+  override def getEngineDescriptorForConstraint(engineConstraint: EngineConstraint): Option[EngineDescriptor] = {
+    engineConstraint match {
+      case SharpConstraint =>
+        Some(SharpWorkerDescriptor())
+      case _ =>
+        None
+    }
+  }
+}
