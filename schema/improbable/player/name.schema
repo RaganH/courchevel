@@ -1,7 +1,0 @@
-package ragan;
-
-component Health {
-  id = 1234;
-  uint32 current_health = 1;
-  uint32 max_health = 2;
-}

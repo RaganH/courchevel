@@ -9,50 +9,32 @@
 
 // Option: missing-value detection (*Specified/ShouldSerialize*/Reset*) enabled
     
-// Generated from: improbable/player/name.proto
+// Generated from: improbable/player/wealth.proto
 // Note: requires additional types generated from: improbable/entity_state.proto
 namespace Schema.Ragan
 {
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"HealthData")]
-  public partial class HealthData : global::ProtoBuf.IExtensible
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"WealthData")]
+  public partial class WealthData : global::ProtoBuf.IExtensible
   {
-    public HealthData() {}
+    public WealthData() {}
     
 
-    private uint? _currentHealth;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"current_health", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint CurrentHealth
+    private int? _current;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"current", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int Current
     {
-      get { return _currentHealth?? default(uint); }
-      set { _currentHealth = value; }
+      get { return _current?? default(int); }
+      set { _current = value; }
     }
     [global::System.Xml.Serialization.XmlIgnore]
     [global::System.ComponentModel.Browsable(false)]
-    public bool CurrentHealthSpecified
+    public bool CurrentSpecified
     {
-      get { return _currentHealth != null; }
-      set { if (value == (_currentHealth== null)) _currentHealth = value ? CurrentHealth : (uint?)null; }
+      get { return _current != null; }
+      set { if (value == (_current== null)) _current = value ? Current : (int?)null; }
     }
-    private bool ShouldSerializeCurrentHealth() { return CurrentHealthSpecified; }
-    private void ResetCurrentHealth() { CurrentHealthSpecified = false; }
-    
-
-    private uint? _maxHealth;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"max_health", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public uint MaxHealth
-    {
-      get { return _maxHealth?? default(uint); }
-      set { _maxHealth = value; }
-    }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool MaxHealthSpecified
-    {
-      get { return _maxHealth != null; }
-      set { if (value == (_maxHealth== null)) _maxHealth = value ? MaxHealth : (uint?)null; }
-    }
-    private bool ShouldSerializeMaxHealth() { return MaxHealthSpecified; }
-    private void ResetMaxHealth() { MaxHealthSpecified = false; }
+    private bool ShouldSerializeCurrent() { return CurrentSpecified; }
+    private void ResetCurrent() { CurrentSpecified = false; }
     
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)

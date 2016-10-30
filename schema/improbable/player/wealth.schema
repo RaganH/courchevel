@@ -1,0 +1,6 @@
+package ragan;
+
+component Wealth {
+  id = 1234;
+  int32 current = 1;
+}

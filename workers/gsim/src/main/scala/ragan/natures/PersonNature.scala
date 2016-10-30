@@ -1,11 +1,13 @@
-package ragan
+package ragan.natures
 
 import improbable.corelib.natures.{BaseNature, NatureApplication, NatureDescription}
 import improbable.corelibrary.transforms.TransformNature
 import improbable.papi.entity.EntityPrefab
 import improbable.papi.entity.behaviour.EntityBehaviourDescriptor
+import ragan.Wealth
+import ragan.behaviours.DelegateStateBehaviour
 
-object HealthNature extends NatureDescription {
+object PersonNature extends NatureDescription {
   override val dependencies = Set[NatureDescription](BaseNature, TransformNature)
 
   override def activeBehaviours: Set[EntityBehaviourDescriptor] = Set(descriptorOf[DelegateStateBehaviour])
@@ -13,10 +15,10 @@ object HealthNature extends NatureDescription {
   def apply(): NatureApplication = {
     application(
       states = Seq(
-        Health(10, 500)
+        Wealth(500)
       ),
       natures = Seq(
-        BaseNature(entityPrefab = EntityPrefab("HealthNature"), isPhysical = false),
+        BaseNature(entityPrefab = EntityPrefab("Person"), isPhysical = false),
         TransformNature()
       )
     )
