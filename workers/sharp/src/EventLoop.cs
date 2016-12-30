@@ -3,6 +3,10 @@ using System.Reflection;
 using System.Threading;
 using Improbable.Worker;
 using Ragan;
+using Improbable;
+using System.Collections.Generic;
+using System.Linq;
+using Improbable.Math;
 
 class EventLoop
 {
@@ -22,6 +26,12 @@ class EventLoop
         {
             Console.WriteLine($"Not enough arguments! Given {args} but expected at least 2. Exiting.");
             return 1;
+        }
+
+        if (args.Length == 2 && args[0].ToLower() == "snapshot")
+        {
+            createSnapshot(args[1]);
+            return 0;
         }
 
         var workerId = args[0];
@@ -59,6 +69,27 @@ class EventLoop
         eventLoop.Run(connection.Value);
 
         return 0;
+    }
+
+    private static void createSnapshot(string snapshotPath)
+    {
+        var entity = new SnapshotEntity();
+
+        entity.Add(new Position.Data(new Coordinates(0, 0, 0)));
+        entity.Add(new Wealth.Data(100));
+        entity.SetAuthority<Wealth>(true);
+
+        IDictionary<EntityId, SnapshotEntity> entities = new Dictionary<EntityId, SnapshotEntity>
+        {
+            {new EntityId(1), entity},
+        };
+        // Save the snapshot back to the file.
+        var errorOpt = Snapshot.Save(snapshotPath, entities);
+        if (errorOpt.HasValue)
+        {
+            Console.WriteLine($"Error saving snapshot: {errorOpt.Value}");
+        }
+        Console.WriteLine($"Saved {snapshotPath} successfully.");
     }
 
     private EventLoop(Connection connection)

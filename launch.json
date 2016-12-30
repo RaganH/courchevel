@@ -2,19 +2,23 @@
     "template": "small",
     "world": {
         "legacy_flags": [
-        ],
+    		{
+    			"name": "game_apps_to_start",
+    			"value": "ragan.InitialSpawner"
+    		}
+    	],
         "legacy_javaparams": [
-                    
+             {
+                "name": "-DFABRIC_LOG_LEVEL",
+                "value": "INFO"
+            }       
         ],
         "dimensions": {
             "x_meters": 1000,
             "z_meters": 1000
         },
         "chunk_edge_length_meters": 100,
-        "streaming_query_interval": 4,
-        "snapshots": {
-            "snapshot_write_period_seconds": 120
-        }
+        "streaming_query_interval": 4
     },
     "workers": [
         {
