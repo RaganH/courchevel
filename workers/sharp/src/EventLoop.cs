@@ -1,41 +1,62 @@
+using System;
+using System.Reflection;
 using System.Threading;
 using Improbable.Worker;
 using Ragan;
-using SharpWorker;
 
 class EventLoop
 {
     private readonly Connection _connection;
     private readonly Dispatcher _dispatcher;
 
-    private Person _person;
+    private const int FramesPerSecond = 60;
+
+    private long _frame;
+    private int _currentPersonWealth = 1;
 
     static int Main(string[] args)
     {
+        Assembly.Load("GeneratedCode"); // Required so subscriptions work
+
         if (args.Length < 2)
         {
+            Console.WriteLine($"Not enough arguments! Given {args} but expected at least 2. Exiting.");
             return 1;
         }
+
+        var workerId = args[0];
+        Console.WriteLine($"Worker {workerId} starting");
+
         var parameters = new ConnectionParameters
         {
             WorkerType = "SharpWorker",
-            WorkerId = args[0],
+            WorkerId = workerId,
             Network =
             {
                 ConnectionType = NetworkConnectionType.Tcp,
                 UseExternalIp = false
             }
         };
-
         var hostname = "localhost";
         if (args.Length == 2)
         {
             hostname = args[1];
         }
-        var connection = new Connection(hostname, 7777, parameters);
-        var eventLoop = new EventLoop(connection);
+        ushort port = 7777;
+
+        var futureConnection = Connection.ConnectAsync(hostname, port, parameters);
+
+        var connection = futureConnection.Get(10000);
+
+        if (!connection.HasValue)
+        {
+            Console.WriteLine($"Timed out waiting for connecton at {hostname}:{port}");
+            return 1;
+        }
+        Console.WriteLine("Connected! Starting event loop");
+        var eventLoop = new EventLoop(connection.Value);    
         
-        eventLoop.Run();
+        eventLoop.Run(connection.Value);
 
         return 0;
     }
@@ -43,21 +64,36 @@ class EventLoop
     private EventLoop(Connection connection)
     {
         _connection = connection;
-
         var dispatcher = new Dispatcher();
-//        dispatcher.OnAddEntity(o => LogOnEntityAdded(connection, o));
+        dispatcher.OnAddEntity(o => LogOnEntityAdded(connection, o));
         dispatcher.OnAddComponent<Wealth>(o => LogOnComponentAdded(connection, o));
+        dispatcher.OnAuthorityChange<Wealth>(o => StartUpdatingWealth(connection, o));
+
         _dispatcher = dispatcher;
+    }
+
+    private void StartUpdatingWealth(Connection conn, AuthorityChangeOp authorityChangeOp)
+    {
+        conn.SendLogMessage(LogLevel.Warn, "EventLoop", $"Authority changed for entity {authorityChangeOp.EntityId} to {authorityChangeOp.HasAuthority}");
+        var entityId = authorityChangeOp.EntityId;
+        if (authorityChangeOp.HasAuthority)
+        {
+            new Thread(() =>
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    var componentUpdate = new Wealth.Update();
+                    componentUpdate.SetCurrent(_currentPersonWealth++);
+                    conn.SendComponentUpdate(entityId, componentUpdate);
+                    Thread.Sleep(1000);
+                }
+            }).Start();
+        }
     }
 
     private void LogOnComponentAdded(Connection conn, AddComponentOp<Wealth> addComponentOp)
     {
-        conn.SendLogMessage(LogLevel.Warn, "EventLoop",
-            $"Wealth component added for entity {addComponentOp.EntityId}");
-//        if (_person == null)
-//        {
-//            _person = new Person(conn, addComponentOp.EntityId, addComponentOp.Data);
-//        }
+        conn.SendLogMessage(LogLevel.Warn, "EventLoop", $"Wealth component added for entity {addComponentOp.EntityId}");
     }
 
     private void LogOnEntityAdded(Connection conn, AddEntityOp obj)
@@ -65,19 +101,23 @@ class EventLoop
         conn.SendLogMessage(LogLevel.Warn, "EventLoop", $"Entity {obj.EntityId} created on worker!!");
     }
 
-    const int FramesPerSecond = 60;
-    void Run()
+    void Run(Connection conn)
     {
         var nextFrameTime = System.DateTime.Now;
         while (true)
         {
+            _frame++;
+            if (_frame%(FramesPerSecond*5) == 0)
+            {
+                conn.SendLogMessage(LogLevel.Warn, "EventLoop", $"Looping...");
+            }
             var opList = _connection.GetOpList(0 /* non-blocking */);
             // Invoke user-provided callbacks.
             _dispatcher.Process(opList);
             // Do other work here...
             nextFrameTime = nextFrameTime.AddMilliseconds(1000f / FramesPerSecond);
-            var waitFor = nextFrameTime.Subtract(System.DateTime.Now);
-            Thread.Sleep(waitFor.Milliseconds > 0 ? waitFor : System.TimeSpan.Zero);
+            var waitFor = nextFrameTime.Subtract(DateTime.Now);
+            Thread.Sleep(waitFor.Milliseconds > 0 ? waitFor : TimeSpan.Zero);
         }
     }
 }

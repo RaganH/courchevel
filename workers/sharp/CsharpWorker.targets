@@ -10,21 +10,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'DebugWindows' Or '$(Configuration)' == 'ReleaseWindows'">
-    <Content Include="improbable\dependencies\native\WorkerSdkDll.dll">
+    <Content Include="improbable\dependencies\native\CoreSdkDll.dll">
       <!-- %(Filename)%(Extension) does not work in xbuild -->
-      <Link>WorkerSdkDll.dll</Link>
+      <Link>CoreSdkDll.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
     <ItemGroup Condition="'$(Configuration)' == 'DebugLinux' Or '$(Configuration)' == 'ReleaseLinux'">
-    <Content Include="improbable\dependencies\native\libWorkerSdkDll.so">
-      <Link>libWorkerSdkDll.so</Link>
+    <Content Include="improbable\dependencies\native\libCoreSdkDll.so">
+      <Link>libCoreSdkDll.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'DebugMacOS' Or '$(Configuration)' == 'ReleaseMacOS'">
-    <Content Include="improbable\dependencies\native\libWorkerSdkDll.dylib">
-      <Link>libWorkerSdkDll.dylib</Link>
+    <Content Include="improbable\dependencies\native\libCoreSdkDll.dylib">
+      <Link>libCoreSdkDll.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

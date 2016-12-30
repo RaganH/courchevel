@@ -48,12 +48,12 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
     <!-- Generate code -->
-    <Exec Command="spatial process_schema --use_worker_defaults --output=improbable/generated --language=csharp" />
+    <Exec Command="spatial process_schema --cachePath=.spatialos/schema_codegen_cache --output=improbable/generated --language=csharp --input=../../schema --input=../../build/dependencies/schema/WorkerSdkSchema --intermediate_proto_dir=.spatialos/schema_codegen_proto" />
   </Target>
 
   <Target Name = "AfterClean">
     <!-- Generated code -->
-    <Exec Command="spatial process_schema clean --use_worker_defaults improbable/generated --language=csharp" />
+    <Exec Command="spatial process_schema clean --cachePath=.spatialos/schema_codegen_cache improbable/generated --language=csharp .spatialos/schema_codegen_proto" />
   </Target>
 
 </Project>
