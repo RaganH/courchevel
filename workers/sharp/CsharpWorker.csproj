@@ -18,10 +18,12 @@
     <RootNamespace>SharpWorker</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\snapshot\SnapshotFactory.cs" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
-    <Compile Include="src\**\*.cs" />
+    <Compile Include="src\EventLoop.cs" />
+    <Compile Include="src\Person.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="CsharpWorker.targets" />

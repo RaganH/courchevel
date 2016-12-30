@@ -3,10 +3,7 @@ using System.Reflection;
 using System.Threading;
 using Improbable.Worker;
 using Ragan;
-using Improbable;
-using System.Collections.Generic;
-using System.Linq;
-using Improbable.Math;
+using SharpWorker.snapshot;
 
 class EventLoop
 {
@@ -20,76 +17,57 @@ class EventLoop
 
     static int Main(string[] args)
     {
-        Assembly.Load("GeneratedCode"); // Required so subscriptions work
-
-        if (args.Length < 2)
+        try
         {
-            Console.WriteLine($"Not enough arguments! Given {args} but expected at least 2. Exiting.");
-            return 1;
-        }
+            Assembly.Load("GeneratedCode"); // Required so subscriptions work
 
-        if (args.Length == 2 && args[0].ToLower() == "snapshot")
-        {
-            createSnapshot(args[1]);
-            return 0;
-        }
-
-        var workerId = args[0];
-        Console.WriteLine($"Worker {workerId} starting");
-
-        var parameters = new ConnectionParameters
-        {
-            WorkerType = "SharpWorker",
-            WorkerId = workerId,
-            Network =
+            if (args.Length == 2 && args[0].ToLower() == "snapshot")
             {
-                ConnectionType = NetworkConnectionType.Tcp,
-                UseExternalIp = false
+                return SnapshotFactory.CreateSnapshot(args[1]);
             }
-        };
-        var hostname = "localhost";
-        if (args.Length == 2)
-        {
-            hostname = args[1];
+
+            if (args.Length < 3)
+            {
+                Console.WriteLine($"ERROR: Expected 3 arguments but given {args}. Exiting.");
+                return 7;
+            }
+
+            var workerId = args[0];
+            var receptionistIp = args[1];
+            var receptionistPort = args[2];
+
+            Console.WriteLine($"Worker {workerId} starting");
+
+            var parameters = new ConnectionParameters
+            {
+                WorkerType = "csharp",
+                WorkerId = workerId,
+                Network =
+                {
+                    ConnectionType = NetworkConnectionType.Tcp,
+                    UseExternalIp = false
+                }
+            };
+            var futureConnection = Connection.ConnectAsync(receptionistIp, (ushort) int.Parse(receptionistPort),
+                parameters);
+
+            var connection = futureConnection.Get(10000);
+            if (!connection.HasValue)
+            {
+                Console.WriteLine($"Timed out waiting for connecton at {receptionistIp}:{receptionistPort}");
+                return 2;
+            }
+            Console.WriteLine("Connected! Starting event loop");
+            var eventLoop = new EventLoop(connection.Value);
+
+            eventLoop.Run(connection.Value);
         }
-        ushort port = 7777;
-
-        var futureConnection = Connection.ConnectAsync(hostname, port, parameters);
-
-        var connection = futureConnection.Get(10000);
-
-        if (!connection.HasValue)
+        catch (Exception e)
         {
-            Console.WriteLine($"Timed out waiting for connecton at {hostname}:{port}");
-            return 1;
+            return 3;
         }
-        Console.WriteLine("Connected! Starting event loop");
-        var eventLoop = new EventLoop(connection.Value);    
-        
-        eventLoop.Run(connection.Value);
 
         return 0;
-    }
-
-    private static void createSnapshot(string snapshotPath)
-    {
-        var entity = new SnapshotEntity();
-
-        entity.Add(new Position.Data(new Coordinates(0, 0, 0)));
-        entity.Add(new Wealth.Data(100));
-        entity.SetAuthority<Wealth>(true);
-
-        IDictionary<EntityId, SnapshotEntity> entities = new Dictionary<EntityId, SnapshotEntity>
-        {
-            {new EntityId(1), entity},
-        };
-        // Save the snapshot back to the file.
-        var errorOpt = Snapshot.Save(snapshotPath, entities);
-        if (errorOpt.HasValue)
-        {
-            Console.WriteLine($"Error saving snapshot: {errorOpt.Value}");
-        }
-        Console.WriteLine($"Saved {snapshotPath} successfully.");
     }
 
     private EventLoop(Connection connection)

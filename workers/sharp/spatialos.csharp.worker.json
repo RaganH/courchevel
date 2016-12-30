@@ -11,16 +11,30 @@
     },
     "entity_interest": {
       "range_entity_interest": {
-        "radius": 2
+        "radius": 100
       }
     },
     "streaming_query": [],
     "component_delivery": {
       "default": "RELIABLE_ORDERED",
       "checkout_all_initially": true
-    },
-    "asset_context": {
-      "use_player_context_if_authoritative": false
+    }
+  },
+  "managed": {
+    "windows": { 
+      "artifact_name": "SharpWorker@Windows.zip",
+      "command": "SharpWorker.exe",
+      "arguments": ["${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
+     },
+    "macos": {
+      "artifact_name": "SharpWorker@Mac.zip",
+      "command": "SharpWorker.exe",
+      "arguments": ["${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
+     },
+    "linux": { 
+      "artifact_name": "SharpWorker@Linux.zip",
+      "command": "SharpWorker.exe",
+      "arguments": ["${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
     }
   }
 }

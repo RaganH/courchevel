@@ -2,10 +2,6 @@
     "template": "small",
     "world": {
         "legacy_flags": [
-    		{
-    			"name": "game_apps_to_start",
-    			"value": "ragan.InitialSpawner"
-    		}
     	],
         "legacy_javaparams": [
              {
