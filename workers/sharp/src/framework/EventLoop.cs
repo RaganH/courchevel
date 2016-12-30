@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using Improbable;
 using Improbable.Worker;
 using Ragan;
 
@@ -7,13 +9,14 @@ namespace SharpWorker.framework
 {
   public class EventLoop
   {
-    private readonly Connection _connection;
-    private readonly Dispatcher _dispatcher;
-
     private const int FramesPerSecond = 60;
 
+    private readonly Connection _connection;
+    private readonly SerializedConnection _serializedConnection;
+    private readonly Dispatcher _dispatcher;
+    private readonly Dictionary<EntityId, IEntityBehaviour> _entityBehaviours;
+
     private long _frame;
-    private int _currentPersonWealth = 1;
 
     public static EventLoop Create(string workerId, string receptionistIp, string receptionistPort)
     {
@@ -27,8 +30,7 @@ namespace SharpWorker.framework
           UseExternalIp = false
         }
       };
-      var futureConnection = Connection.ConnectAsync(receptionistIp, (ushort) int.Parse(receptionistPort),
-        parameters);
+      var futureConnection = Connection.ConnectAsync(receptionistIp, (ushort) int.Parse(receptionistPort), parameters);
 
       var connection = futureConnection.Get(10000);
       if (!connection.HasValue)
@@ -41,11 +43,44 @@ namespace SharpWorker.framework
     private EventLoop(Connection connection)
     {
       _connection = connection;
-      var dispatcher = new Dispatcher();
-      dispatcher.OnAddEntity(o => LogOnEntityAdded(connection, o));
-      dispatcher.OnAddComponent<Wealth>(o => LogOnComponentAdded(connection, o));
-      dispatcher.OnAuthorityChange<Wealth>(o => StartUpdatingWealth(connection, o));
 
+      _entityBehaviours = new Dictionary<EntityId, IEntityBehaviour>();
+      _serializedConnection = new SerializedConnection(connection);
+
+      var dispatcher = new Dispatcher();
+      dispatcher.OnAddEntity(o =>
+      {
+        _serializedConnection.Do(c => c.SendLogMessage(LogLevel.Warn, "EventLoop", $"Entity {o.EntityId} created on worker!!"));
+        _entityBehaviours[o.EntityId] = new Person(_serializedConnection, o.EntityId);
+      });
+      dispatcher.OnAddComponent<Wealth>(o =>
+      {
+        connection.SendLogMessage(LogLevel.Warn, "EventLoop", $"Wealth component added for entity {o.EntityId}");
+        IEntityBehaviour behaviour;
+        if (_entityBehaviours.TryGetValue(o.EntityId, out behaviour))
+        {
+          behaviour.AddComponent(o);
+        }
+        else
+        {
+          //TODO(harry) - log here
+        }
+      });
+      dispatcher.OnAuthorityChange<Wealth>(o =>
+      {
+        _serializedConnection.Do(c => c.SendLogMessage(LogLevel.Warn, "EventLoop",
+          $"Authority changed on entity {o.EntityId} for component {Wealth.ComponentId} to {o.HasAuthority}"));
+
+        IEntityBehaviour behaviour;
+        if (_entityBehaviours.TryGetValue(o.EntityId, out behaviour))
+        {
+          behaviour.AuthorityChanged(o);
+        }
+        else
+        {
+          //TODO(harry) - log here
+        }
+      });
       _dispatcher = dispatcher;
     }
 
@@ -64,42 +99,10 @@ namespace SharpWorker.framework
         // Invoke user-provided callbacks.
         _dispatcher.Process(opList);
 
-        // Do other work here...
         nextFrameTime = nextFrameTime.AddMilliseconds(1000f / FramesPerSecond);
         var waitFor = nextFrameTime.Subtract(DateTime.Now);
         Thread.Sleep(waitFor.Milliseconds > 0 ? waitFor : TimeSpan.Zero);
       }
     }
-
-    private void StartUpdatingWealth(Connection conn, AuthorityChangeOp authorityChangeOp)
-    {
-      conn.SendLogMessage(LogLevel.Warn, "EventLoop",
-        $"Authority changed for entity {authorityChangeOp.EntityId} to {authorityChangeOp.HasAuthority}");
-      var entityId = authorityChangeOp.EntityId;
-      if (authorityChangeOp.HasAuthority)
-      {
-        new Thread(() =>
-        {
-          for (int i = 0; i < 1000; i++)
-          {
-            var componentUpdate = new Wealth.Update();
-            componentUpdate.SetCurrent(_currentPersonWealth++);
-            conn.SendComponentUpdate(entityId, componentUpdate);
-            Thread.Sleep(1000);
-          }
-        }).Start();
-      }
-    }
-
-    private void LogOnComponentAdded(Connection conn, AddComponentOp<Wealth> addComponentOp)
-    {
-      conn.SendLogMessage(LogLevel.Warn, "EventLoop", $"Wealth component added for entity {addComponentOp.EntityId}");
-    }
-
-    private void LogOnEntityAdded(Connection conn, AddEntityOp obj)
-    {
-      conn.SendLogMessage(LogLevel.Warn, "EventLoop", $"Entity {obj.EntityId} created on worker!!");
-    }
-
   }
 }

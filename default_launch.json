@@ -4,10 +4,6 @@
         "legacy_flags": [
     	],
         "legacy_javaparams": [
-             {
-                "name": "-DFABRIC_LOG_LEVEL",
-                "value": "INFO"
-            }       
         ],
         "dimensions": {
             "x_meters": 1000,

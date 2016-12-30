@@ -19,7 +19,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\errors\ErrorCodes.cs" />
+    <Compile Include="src\framework\EntityBehaviour.cs" />
     <Compile Include="src\framework\EventLoop.cs" />
+    <Compile Include="src\framework\SerializedConnection.cs" />
     <Compile Include="src\snapshot\SnapshotFactory.cs" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
