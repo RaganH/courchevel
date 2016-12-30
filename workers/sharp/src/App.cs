@@ -29,11 +29,10 @@ namespace SharpWorker
         var receptionistIp = args[1];
         var receptionistPort = args[2];
 
-
         EventLoop eventLoop;
         try
         {
-          eventLoop = EventLoop.Create(workerId, receptionistIp, receptionistPort);
+          eventLoop = EventLoop.Connect(workerId, receptionistIp, receptionistPort);
         }
         catch (Exception e)
         {

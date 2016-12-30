@@ -4,7 +4,7 @@ using System.Threading;
 using Improbable;
 using Improbable.Worker;
 using Ragan;
-
+using SharpWorker.simulation;
 namespace SharpWorker.framework
 {
   public class EventLoop
@@ -18,7 +18,7 @@ namespace SharpWorker.framework
 
     private long _frame;
 
-    public static EventLoop Create(string workerId, string receptionistIp, string receptionistPort)
+    public static EventLoop Connect(string workerId, string receptionistIp, string receptionistPort)
     {
       var parameters = new ConnectionParameters
       {

@@ -5,7 +5,7 @@ using Improbable.Worker;
 using Ragan;
 using SharpWorker.framework;
 
-namespace SharpWorker
+namespace SharpWorker.simulation
 {
   class Person : IEntityBehaviour
   {

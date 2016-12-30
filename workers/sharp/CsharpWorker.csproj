@@ -19,15 +19,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\errors\ErrorCodes.cs" />
-    <Compile Include="src\framework\EntityBehaviour.cs" />
+    <Compile Include="src\framework\IEntityBehaviour.cs" />
     <Compile Include="src\framework\EventLoop.cs" />
     <Compile Include="src\framework\SerializedConnection.cs" />
+    <Compile Include="src\simulation\Person.cs" />
     <Compile Include="src\snapshot\SnapshotFactory.cs" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
     <Compile Include="src\App.cs" />
-    <Compile Include="src\Person.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="CsharpWorker.targets" />
