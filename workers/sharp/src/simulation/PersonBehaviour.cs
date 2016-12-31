@@ -1,33 +1,27 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Improbable;
-using Improbable.Worker;
 using Ragan;
 using SharpWorker.framework;
 
 namespace SharpWorker.simulation
 {
-  class Person : IEntityBehaviour
+  class PersonBehaviour : IComponentBehaviour
   {
     private readonly SerializedConnection _conn;
     private readonly EntityId _entityId;
-    private int _currentPersonWealth = 1;
-    private Thread _thread;
+    private int _currentPersonWealth;
 
-    public Person(SerializedConnection conn, EntityId entityId)
+    public PersonBehaviour(SerializedConnection conn, EntityId entityId, PersonData value)
     {
       _conn = conn;
       _entityId = entityId;
+      _currentPersonWealth = value.wealth.current;
     }
 
-    public void AddComponent(AddComponentOp<Wealth> data)
+    public void AuthorityChanged(bool hasAuthority)
     {
-      _currentPersonWealth = data.Data.Get().Value.current;
-    }
-
-    public void AuthorityChanged(AuthorityChangeOp authorityChangeOp)
-    {
-      if (authorityChangeOp.HasAuthority)
+      if (hasAuthority)
       {
         Task.Run(() => StartUpdatingWealth());
       }
@@ -41,9 +35,16 @@ namespace SharpWorker.simulation
     {
       while (true)
       {
-        var componentUpdate = new Wealth.Update();
-        componentUpdate.SetCurrent(_currentPersonWealth++);
+        var componentUpdate = new Person.Update
+        {
+          wealth = new Wealth
+          {
+            current = _currentPersonWealth++,
+          }
+        };
+
         _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
+
         Thread.Sleep(1000);
       }
     }

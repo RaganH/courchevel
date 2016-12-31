@@ -28,5 +28,13 @@ namespace SharpWorker.framework
         return func(_connection);
       }
     }
+
+    public void SendLogMessage(LogLevel level, string loggerName, string message)
+    {
+      lock (_lock)
+      {
+        _connection.SendLogMessage(level, loggerName, message);
+      }
+    }
   }
 }

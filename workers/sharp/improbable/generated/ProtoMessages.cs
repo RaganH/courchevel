@@ -9,119 +9,6 @@
 
 // Option: missing-value detection (*Specified/ShouldSerialize*/Reset*) enabled
     
-// Generated from: improbable/player/wealth.proto
-// Note: requires additional types generated from: improbable/entity_state.proto
-// Note: requires additional types generated from: improbable/math/coordinates.proto
-namespace Schema.Ragan
-{
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"WealthData")]
-  public partial class WealthData : global::ProtoBuf.IExtensible
-  {
-    public WealthData() {}
-    
-
-    private int? _field1Current;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"field1_current", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    public int Field1Current
-    {
-      get { return _field1Current?? default(int); }
-      set { _field1Current = value; }
-    }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool Field1CurrentSpecified
-    {
-      get { return _field1Current != null; }
-      set { if (value == (_field1Current== null)) _field1Current = value ? Field1Current : (int?)null; }
-    }
-    private bool ShouldSerializeField1Current() { return Field1CurrentSpecified; }
-    private void ResetField1Current() { Field1CurrentSpecified = false; }
-    
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"PositionData")]
-  public partial class PositionData : global::ProtoBuf.IExtensible
-  {
-    public PositionData() {}
-    
-
-    private Schema.Improbable.Math.Coordinates _field1Position = null;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"field1_position", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public Schema.Improbable.Math.Coordinates Field1Position
-    {
-      get { return _field1Position; }
-      set { _field1Position = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Wealth")]
-  public partial class Wealth : global::ProtoBuf.IExtensible
-  {
-    public Wealth() {}
-    
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Events")]
-  public partial class Events : global::ProtoBuf.IExtensible
-  {
-    public Events() {}
-    
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Commands")]
-  public partial class Commands : global::ProtoBuf.IExtensible
-  {
-    public Commands() {}
-    
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Position")]
-  public partial class Position : global::ProtoBuf.IExtensible
-  {
-    public Position() {}
-    
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Events")]
-  public partial class Events : global::ProtoBuf.IExtensible
-  {
-    public Events() {}
-    
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Commands")]
-  public partial class Commands : global::ProtoBuf.IExtensible
-  {
-    public Commands() {}
-    
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-}
 // Generated from: improbable/standard_library.proto
 // Note: requires additional types generated from: improbable/entity_state.proto
 namespace Schema.Improbable
@@ -274,6 +161,98 @@ namespace Schema.Improbable
   public partial class EntityAcl : global::ProtoBuf.IExtensible
   {
     public EntityAcl() {}
+    
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Events")]
+  public partial class Events : global::ProtoBuf.IExtensible
+  {
+    public Events() {}
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Commands")]
+  public partial class Commands : global::ProtoBuf.IExtensible
+  {
+    public Commands() {}
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+}
+// Generated from: ragan/wealth.proto
+// Note: requires additional types generated from: improbable/entity_state.proto
+// Note: requires additional types generated from: improbable/math/coordinates.proto
+namespace Schema.Ragan
+{
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Wealth")]
+  public partial class Wealth : global::ProtoBuf.IExtensible
+  {
+    public Wealth() {}
+    
+
+    private int? _field1Current;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"field1_current", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int Field1Current
+    {
+      get { return _field1Current?? default(int); }
+      set { _field1Current = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool Field1CurrentSpecified
+    {
+      get { return _field1Current != null; }
+      set { if (value == (_field1Current== null)) _field1Current = value ? Field1Current : (int?)null; }
+    }
+    private bool ShouldSerializeField1Current() { return Field1CurrentSpecified; }
+    private void ResetField1Current() { Field1CurrentSpecified = false; }
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"PersonData")]
+  public partial class PersonData : global::ProtoBuf.IExtensible
+  {
+    public PersonData() {}
+    
+
+    private Schema.Improbable.Math.Coordinates _field1Position = null;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"field1_position", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public Schema.Improbable.Math.Coordinates Field1Position
+    {
+      get { return _field1Position; }
+      set { _field1Position = value; }
+    }
+
+    private Schema.Ragan.Wealth _field2Wealth = null;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"field2_wealth", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public Schema.Ragan.Wealth Field2Wealth
+    {
+      get { return _field2Wealth; }
+      set { _field2Wealth = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Person")]
+  public partial class Person : global::ProtoBuf.IExtensible
+  {
+    public Person() {}
     
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Events")]
   public partial class Events : global::ProtoBuf.IExtensible

@@ -14,8 +14,7 @@ namespace SharpWorker.snapshot
     {
       var entity = new SnapshotEntity();
 
-      entity.Add(new Position.Data(new Coordinates(0, 0, 0)));
-      entity.Add(new Wealth.Data(100));
+      entity.Add(new Person.Data(new Coordinates(0, 0, 0), new Wealth(100)));
 
       var workerPredicate = new WorkerPredicate(new Improbable.Collections.List<WorkerClaim>
       {
@@ -26,7 +25,7 @@ namespace SharpWorker.snapshot
       });
       entity.Add(new EntityAcl.Data(workerPredicate, new ComponentAcl(new Map<uint, WorkerPredicate>
       {
-        {Wealth.ComponentId, workerPredicate}
+        {Person.ComponentId, workerPredicate}
       })));
 
       IDictionary<EntityId, SnapshotEntity> entities = new Dictionary<EntityId, SnapshotEntity>
