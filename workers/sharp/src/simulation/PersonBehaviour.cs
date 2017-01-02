@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Improbable;
+using Improbable.Worker;
 using Ragan;
 using SharpWorker.framework;
 
@@ -12,11 +13,11 @@ namespace SharpWorker.simulation
     private readonly EntityId _entityId;
     private int _currentPersonWealth;
 
-    public PersonBehaviour(SerializedConnection conn, EntityId entityId, PersonData value)
+    public PersonBehaviour(SerializedConnection conn, IComponentData<Person> value, EntityId entityId)
     {
       _conn = conn;
       _entityId = entityId;
-      _currentPersonWealth = value.wealth.current;
+      _currentPersonWealth = value.Get().Value.wealth.current;
     }
 
     public void AuthorityChanged(bool hasAuthority)

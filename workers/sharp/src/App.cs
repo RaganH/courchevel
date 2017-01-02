@@ -1,7 +1,9 @@
 using System;
 using System.Reflection;
+using Ragan;
 using SharpWorker.errors;
 using SharpWorker.framework;
+using SharpWorker.simulation;
 using SharpWorker.snapshot;
 
 namespace SharpWorker
@@ -38,6 +40,16 @@ namespace SharpWorker
         {
           return ErrorCodes.ErrInitialConnectionFailed;
         }
+
+        try
+        {
+          eventLoop.Register<Person, PersonBehaviour>((conn, data, id) => new PersonBehaviour(conn, data, id));
+        }
+        catch (Exception e)
+        {
+          return ErrorCodes.ErrCallbackRegistrationFailed;
+        }
+
         eventLoop.Run();
 
         return 0;

@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading;
 using Improbable;
 using Improbable.Worker;
-using Ragan;
-using SharpWorker.simulation;
+using Improbable.Worker.Internal;
 
 namespace SharpWorker.framework
 {
@@ -52,53 +51,49 @@ namespace SharpWorker.framework
 
       SubscribeToAddEntity(dispatcher);
 
-      SubscribeToPersonComponentAdded(dispatcher);
-
-      SubscribeToPersonAuthorityChanged(dispatcher);
-
       _dispatcher = dispatcher;
     }
 
-    private void SubscribeToPersonAuthorityChanged(Dispatcher dispatcher)
+    public void Register<TMeta, TBehaviour>(Func<SerializedConnection, IComponentData<TMeta>, EntityId, TBehaviour> creationFunc)
+      where TMeta : IComponentMetaclass
+      where TBehaviour : IComponentBehaviour
     {
-      dispatcher.OnAuthorityChange<Person>(o =>
+      var componentId = ComponentDatabase.MetaclassToId<TMeta>();
+      _dispatcher.OnAddComponent<TMeta>(o =>
       {
-        IList<IComponentBehaviour> behaviour;
-        if (_componentBehaviours.TryGetValue(o.EntityId, out behaviour))
+        IList<IComponentBehaviour> behaviours;
+        if (_componentBehaviours.TryGetValue(o.EntityId, out behaviours))
         {
-          var personBehaviour = behaviour.FirstOrDefault(b => b is PersonBehaviour);
-          if (personBehaviour != null)
-          {
-            _logger.Warn(
-              $"Authority changed on entity {o.EntityId} for component {Person.ComponentId} to {o.HasAuthority}");
-            personBehaviour.AuthorityChanged(o.HasAuthority);
-          }
-          else
-          {
-            _logger.Warn($"Received AuthorityChanged on entity {o.EntityId} for unknown component {Person.ComponentId}");
-          }
-        }
-        else
-        {
-          _logger.Warn($"Received AuthorityChanged for component {Person.ComponentId} on unknown entity {o.EntityId}");
-        }
-      });
-    }
+          _logger.Warn($"Component added for entity {o.EntityId}");
 
-    private void SubscribeToPersonComponentAdded(Dispatcher dispatcher)
-    {
-      dispatcher.OnAddComponent<Person>(o =>
-      {
-        IList<IComponentBehaviour> behaviour;
-        if (_componentBehaviours.TryGetValue(o.EntityId, out behaviour))
-        {
-          _logger.Warn($"Person component added for entity {o.EntityId}");
-
-          behaviour.Add(new PersonBehaviour(_serializedConnection, o.EntityId, o.Data.Get().Value));
+          behaviours.Add(creationFunc(_serializedConnection, o.Data, o.EntityId));
         }
         else
         {
           _logger.Warn($"Person component added for unknown entity {o.EntityId}");
+        }
+      });
+
+      _dispatcher.OnAuthorityChange<TMeta>(o =>
+      {
+        IList<IComponentBehaviour> behaviour;
+        if (_componentBehaviours.TryGetValue(o.EntityId, out behaviour))
+        {
+          var componentBehvaiour = behaviour.FirstOrDefault(b => b is TBehaviour);
+          if (componentBehvaiour != null)
+          {
+            _logger.Warn(
+              $"Authority changed on entity {o.EntityId} for component {componentId} to {o.HasAuthority}");
+            componentBehvaiour.AuthorityChanged(o.HasAuthority);
+          }
+          else
+          {
+            _logger.Warn($"Received AuthorityChanged on entity {o.EntityId} for unknown component {componentId}");
+          }
+        }
+        else
+        {
+          _logger.Warn($"Received AuthorityChanged for component {componentId} on unknown entity {o.EntityId}");
         }
       });
     }

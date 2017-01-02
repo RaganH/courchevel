@@ -4,6 +4,7 @@
   {
     public const int ErrNotEnoughArgs = 10;
     public const int ErrInitialConnectionFailed = 11;
-    public const int ErrUnhandledException = 12;
+    public const int ErrCallbackRegistrationFailed = 12;
+    public const int ErrUnhandledException = 13;
   }
 }

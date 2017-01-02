@@ -1,6 +1,6 @@
 namespace SharpWorker.framework
 {
-  interface IComponentBehaviour
+  public interface IComponentBehaviour
   {
     void AuthorityChanged(bool hasAuthority);
   }
