@@ -54,7 +54,7 @@ namespace SharpWorker.framework
       _dispatcher = dispatcher;
     }
 
-    public void Register<TMeta, TBehaviour>(Func<SerializedConnection, IComponentData<TMeta>, EntityId, TBehaviour> creationFunc)
+    public void Register<TMeta, TBehaviour>(Func<SerializedConnection, Dispatcher, IComponentData<TMeta>, EntityId, TBehaviour> creationFunc)
       where TMeta : IComponentMetaclass
       where TBehaviour : IComponentBehaviour<TMeta>
     {
@@ -66,7 +66,7 @@ namespace SharpWorker.framework
         {
           _logger.Warn($"Component added for entity {o.EntityId}");
 
-          behaviours.Add(creationFunc(_serializedConnection, o.Data, o.EntityId));
+          behaviours.Add(creationFunc(_serializedConnection, _dispatcher, o.Data, o.EntityId));
         }
         else
         {

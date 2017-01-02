@@ -43,7 +43,8 @@ namespace SharpWorker
 
         try
         {
-          eventLoop.Register<Person, PersonBehaviour>((conn, data, id) => new PersonBehaviour(conn, data, id));
+          eventLoop.Register<Person, PersonBehaviour>((conn, dispatcher, data, id) => new PersonBehaviour(conn, dispatcher, data, id));
+          eventLoop.Register<Mountain, MountainBehaviour>((conn, dispatcher, data, id) => new MountainBehaviour(conn, dispatcher, data, id));
         }
         catch (Exception e)
         {

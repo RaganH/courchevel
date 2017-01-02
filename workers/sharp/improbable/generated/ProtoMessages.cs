@@ -249,10 +249,77 @@ namespace Schema.Ragan
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"MountainData")]
+  public partial class MountainData : global::ProtoBuf.IExtensible
+  {
+    public MountainData() {}
+    
+
+    private Schema.Improbable.Math.Coordinates _field1Position = null;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"field1_position", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public Schema.Improbable.Math.Coordinates Field1Position
+    {
+      get { return _field1Position; }
+      set { _field1Position = value; }
+    }
+
+    private int? _field2Ore;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"field2_ore", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public int Field2Ore
+    {
+      get { return _field2Ore?? default(int); }
+      set { _field2Ore = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool Field2OreSpecified
+    {
+      get { return _field2Ore != null; }
+      set { if (value == (_field2Ore== null)) _field2Ore = value ? Field2Ore : (int?)null; }
+    }
+    private bool ShouldSerializeField2Ore() { return Field2OreSpecified; }
+    private void ResetField2Ore() { Field2OreSpecified = false; }
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Person")]
   public partial class Person : global::ProtoBuf.IExtensible
   {
     public Person() {}
+    
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Events")]
+  public partial class Events : global::ProtoBuf.IExtensible
+  {
+    public Events() {}
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Commands")]
+  public partial class Commands : global::ProtoBuf.IExtensible
+  {
+    public Commands() {}
+    
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Mountain")]
+  public partial class Mountain : global::ProtoBuf.IExtensible
+  {
+    public Mountain() {}
     
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"Events")]
   public partial class Events : global::ProtoBuf.IExtensible

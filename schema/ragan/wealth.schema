@@ -11,3 +11,11 @@ component Person {
 
 	Wealth wealth = 2;
 }
+
+component Mountain {
+	id = 1235;
+
+	EntityPosition position = 1;
+
+	int32 ore = 2;
+}
