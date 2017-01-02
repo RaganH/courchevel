@@ -56,7 +56,7 @@ namespace SharpWorker.framework
 
     public void Register<TMeta, TBehaviour>(Func<SerializedConnection, IComponentData<TMeta>, EntityId, TBehaviour> creationFunc)
       where TMeta : IComponentMetaclass
-      where TBehaviour : IComponentBehaviour
+      where TBehaviour : IComponentBehaviour<TMeta>
     {
       var componentId = ComponentDatabase.MetaclassToId<TMeta>();
       _dispatcher.OnAddComponent<TMeta>(o =>
@@ -84,7 +84,28 @@ namespace SharpWorker.framework
           {
             _logger.Warn(
               $"Authority changed on entity {o.EntityId} for component {componentId} to {o.HasAuthority}");
-            componentBehvaiour.AuthorityChanged(o.HasAuthority);
+            ((TBehaviour)componentBehvaiour).AuthorityChanged(o.HasAuthority);
+          }
+          else
+          {
+            _logger.Warn($"Received AuthorityChanged on entity {o.EntityId} for unknown component {componentId}");
+          }
+        }
+        else
+        {
+          _logger.Warn($"Received AuthorityChanged for component {componentId} on unknown entity {o.EntityId}");
+        }
+      });
+
+      _dispatcher.OnComponentUpdate<TMeta>(o =>
+      {
+        IList<IComponentBehaviour> behaviour;
+        if (_componentBehaviours.TryGetValue(o.EntityId, out behaviour))
+        {
+          var componentBehvaiour = behaviour.FirstOrDefault(b => b is TBehaviour);
+          if (componentBehvaiour != null)
+          {
+            ((TBehaviour)componentBehvaiour).Update(o.Update);
           }
           else
           {

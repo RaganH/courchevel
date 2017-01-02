@@ -7,17 +7,17 @@ using SharpWorker.framework;
 
 namespace SharpWorker.simulation
 {
-  class PersonBehaviour : IComponentBehaviour
+  class PersonBehaviour : IComponentBehaviour<Person>
   {
     private readonly SerializedConnection _conn;
     private readonly EntityId _entityId;
-    private int _currentPersonWealth;
+    private int _currentWealth;
 
     public PersonBehaviour(SerializedConnection conn, IComponentData<Person> value, EntityId entityId)
     {
       _conn = conn;
       _entityId = entityId;
-      _currentPersonWealth = value.Get().Value.wealth.current;
+      _currentWealth = value.Get().Value.wealth.current;
     }
 
     public void AuthorityChanged(bool hasAuthority)
@@ -40,13 +40,22 @@ namespace SharpWorker.simulation
         {
           wealth = new Wealth
           {
-            current = _currentPersonWealth++,
+            current = _currentWealth+1,
           }
         };
 
         _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
 
         Thread.Sleep(1000);
+      }
+    }
+
+    public void Update(IComponentUpdate<Person> componentUpdate)
+    {
+      var wealthOption = componentUpdate.Get().wealth;
+      if (wealthOption.HasValue)
+      {
+        _currentWealth = wealthOption.Value.current;
       }
     }
   }
