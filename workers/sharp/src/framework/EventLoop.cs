@@ -15,6 +15,8 @@ namespace SharpWorker.framework
     private readonly Logger _logger;
     private readonly SerializedConnection _serializedConnection;
     private readonly Dispatcher _dispatcher;
+    private readonly Dependencies _dependencies;
+
     private readonly Dictionary<EntityId, IList<IComponentBehaviour>> _componentBehaviours;
 
     private long _frame;
@@ -48,13 +50,14 @@ namespace SharpWorker.framework
       _logger = Logger.WithName(_serializedConnection, typeof(EventLoop).Name);
 
       var dispatcher = new Dispatcher();
-
       SubscribeToAddEntity(dispatcher);
+
+      _dependencies = new Dependencies(connection, new QueryDispatcher(dispatcher, connection));
 
       _dispatcher = dispatcher;
     }
 
-    public void Register<TMeta, TBehaviour>(Func<SerializedConnection, Dispatcher, IComponentData<TMeta>, EntityId, TBehaviour> creationFunc)
+    public void Register<TMeta, TBehaviour>(Func<Dependencies, IComponentData<TMeta>, EntityId, TBehaviour> creationFunc)
       where TMeta : IComponentMetaclass
       where TBehaviour : IComponentBehaviour<TMeta>
     {
@@ -66,7 +69,7 @@ namespace SharpWorker.framework
         {
           _logger.Warn($"Component added for entity {o.EntityId}");
 
-          behaviours.Add(creationFunc(_serializedConnection, _dispatcher, o.Data, o.EntityId));
+          behaviours.Add(creationFunc(_dependencies, o.Data, o.EntityId));
         }
         else
         {

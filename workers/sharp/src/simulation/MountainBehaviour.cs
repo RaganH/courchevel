@@ -7,9 +7,9 @@ namespace SharpWorker.simulation
 {
   internal class MountainBehaviour : IComponentBehaviour<Mountain>
   {
-    public MountainBehaviour(SerializedConnection conn, Dispatcher dispatcher, IComponentData<Mountain> arg3, EntityId arg4)
+    public MountainBehaviour(Dependencies deps, IComponentData<Mountain> dispatcher, EntityId entityId)
     {
-      
+
     }
 
     public void AuthorityChanged(bool hasAuthority)

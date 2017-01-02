@@ -19,9 +19,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\errors\ErrorCodes.cs" />
+    <Compile Include="src\framework\Dependencies.cs" />
     <Compile Include="src\framework\IComponentBehaviour.cs" />
     <Compile Include="src\framework\EventLoop.cs" />
     <Compile Include="src\framework\Logger.cs" />
+    <Compile Include="src\framework\QueryDispatcher.cs" />
     <Compile Include="src\framework\SerializedConnection.cs" />
     <Compile Include="src\simulation\MountainBehaviour.cs" />
     <Compile Include="src\simulation\PersonBehaviour.cs" />

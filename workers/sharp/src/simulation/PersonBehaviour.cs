@@ -12,8 +12,8 @@ namespace SharpWorker.simulation
 {
   class PersonBehaviour : IComponentBehaviour<Person>
   {
+    private readonly Dependencies _deps;
     private readonly SerializedConnection _conn;
-    private readonly Dispatcher _dispatcher;
     private readonly EntityId _entityId;
     private readonly Logger _logger;
 
@@ -22,15 +22,15 @@ namespace SharpWorker.simulation
     private Coordinates _target;
     private ulong _callbackKey;
 
-    public PersonBehaviour(SerializedConnection conn, Dispatcher dispatcher, IComponentData<Person> value, EntityId entityId)
+    public PersonBehaviour(Dependencies deps, IComponentData<Person> initialData, EntityId entityId)
     {
-      _conn = conn;
-      _dispatcher = dispatcher;
+      _deps = deps;
+      _conn = deps.Connection;
       _entityId = entityId;
 
-      _logger = Logger.WithName(conn, typeof(PersonBehaviour).Name);
+      _logger = Logger.WithName(_conn, typeof(PersonBehaviour).Name);
 
-      var data = value.Get().Value;
+      var data = initialData.Get().Value;
       _currentWealth = data.wealth.current;
       _currentPosition = data.position;
 
@@ -52,9 +52,7 @@ namespace SharpWorker.simulation
             ),
           ResultType = new SnapshotResultType()
         };
-
-        var id = _conn.Do(c => c.SendEntityQueryRequest(entityQuery, 5000));
-        _callbackKey = _dispatcher.OnEntityQueryResponse(o => MoveToTarget(id, o));
+        _deps.QueryDispatcher.Send(entityQuery, MoveToNearbyMountain);
 
         Task.Run(() => StartUpdatingWealth());
       }
@@ -64,28 +62,17 @@ namespace SharpWorker.simulation
       }
     }
 
-    private void MoveToTarget(RequestId<EntityQueryRequest> id, EntityQueryResponseOp entityQueryResponseOp)
+    private void MoveToNearbyMountain(EntityQueryResponseOp entityQueryResponseOp)
     {
-      if (entityQueryResponseOp.RequestId == id)
+      var results = entityQueryResponseOp.Result;
+      if (results.Any())
       {
-        _dispatcher.Remove(_callbackKey);
-
-        if (entityQueryResponseOp.StatusCode != StatusCode.Success)
+        var target = results.Where(r => r.Value.Get<Mountain>().HasValue).ToList();
+        if (target.Any())
         {
-          _logger.Warn($"Query failed with {entityQueryResponseOp.Message}");
-          return;
-        }
-
-        var results = entityQueryResponseOp.Result;
-        if (results.Any())
-        {
-          var target = results.Where(r => r.Value.Get<Mountain>().HasValue).ToList();
-          if (target.Any())
-          {
-            _logger.Warn($"Moving {_entityId} towards mountain");
-            _target = target.First().Value.Get<Mountain>().Value.Get().Value.position;
-            Task.Run(() => MoveToTarget());
-          }
+          _logger.Warn($"Moving {_entityId} towards mountain");
+          _target = target.First().Value.Get<Mountain>().Value.Get().Value.position;
+          Task.Run(() => MoveToTarget());
         }
       }
     }
@@ -124,7 +111,7 @@ namespace SharpWorker.simulation
 
         _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
 
-        Thread.Sleep(1000);
+        Thread.Sleep(500);
       }
     }
 
