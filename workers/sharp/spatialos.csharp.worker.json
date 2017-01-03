@@ -21,7 +21,7 @@
     }
   },
   "managed": {
-    "windows": { 
+    "windows": {
       "artifact_name": "SharpWorker@Windows.zip",
       "command": "SharpWorker.exe",
       "arguments": ["${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
@@ -31,10 +31,10 @@
       "command": "SharpWorker.exe",
       "arguments": ["${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
      },
-    "linux": { 
+    "linux": {
       "artifact_name": "SharpWorker@Linux.zip",
-      "command": "SharpWorker.exe",
-      "arguments": ["${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
+      "command": "mono",
+      "arguments": ["SharpWorker.exe", "${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
     }
   }
 }
