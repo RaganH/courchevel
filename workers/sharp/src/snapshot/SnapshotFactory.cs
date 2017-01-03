@@ -10,21 +10,34 @@ namespace SharpWorker.snapshot
 {
   public static class SnapshotFactory
   {
+    private const int worldSize = 1000;
+
     public static int CreateSnapshot(string snapshotPath)
     {
-      var personEntity = new SnapshotEntity();
-      personEntity.Add(new Person.Data(new Coordinates(0, 0, 0), new Wealth(100)));
-      AssignToSharpWorker(personEntity, Person.ComponentId);
+      IDictionary<EntityId, SnapshotEntity> entities = new Dictionary<EntityId, SnapshotEntity>();
+      int currentEntityId = 1;
 
-      var mountainEntity = new SnapshotEntity();
-      mountainEntity.Add(new Mountain.Data(new Coordinates(50,100,150), 500));
-      AssignToSharpWorker(mountainEntity, Mountain.ComponentId);
-
-      IDictionary<EntityId, SnapshotEntity> entities = new Dictionary<EntityId, SnapshotEntity>
+      var mountainGrid = PlaceInSquareGrid(3, 0);
+      foreach (var coord in mountainGrid)
       {
-        {new EntityId(1), personEntity},
-        {new EntityId(2), mountainEntity},
-      };
+        var mountainEntity = new SnapshotEntity();
+        mountainEntity.Add(new Mountain.Data(coord, 500));
+        AssignToSharpWorker(mountainEntity, Mountain.ComponentId);
+
+        entities[new EntityId(currentEntityId)] = mountainEntity;
+        currentEntityId++;
+      }
+
+      var personGrid = PlaceInSquareGrid(5, 0);
+      foreach (var coord in personGrid)
+      {
+        var personEntity = new SnapshotEntity();
+        personEntity.Add(new Person.Data(coord, new Wealth(100)));
+        AssignToSharpWorker(personEntity, Person.ComponentId);
+
+        entities[new EntityId(currentEntityId)] = personEntity;
+        currentEntityId++;
+      }
 
       var errorOpt = Snapshot.Save(snapshotPath, entities);
       if (errorOpt.HasValue)
@@ -49,6 +62,29 @@ namespace SharpWorker.snapshot
       {
         {componentId, workerPredicate}
       })));
+    }
+
+    private static Coordinates[] PlaceInSquareGrid(int width, double centre)
+    {
+      double buffer = (worldSize / width) / 2;
+      double bottomLeft = centre - worldSize / 2 + buffer;
+      double spacing = (worldSize - 2 * buffer) / (width-1);
+
+      var grid = new Coordinates[width * width];
+
+      double currentX = bottomLeft;
+      for (int i = 0; i < width; i++)
+      {
+        double currentZ = bottomLeft;
+        for (int j = 0; j < width; j++)
+        {
+          grid[i * width + j] = new Coordinates(currentX, 0, currentZ);
+          currentZ = currentZ + spacing;
+        }
+        currentX = currentX + spacing;
+      }
+
+      return grid;
     }
   }
 }

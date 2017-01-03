@@ -137,14 +137,9 @@ namespace SharpWorker.framework
       while (true)
       {
         _frame++;
-        if (_frame % (FramesPerSecond * 5) == 0)
-        {
-          _logger.Warn($"Looping...");
-        }
 
         var opList = _serializedConnection.Do(c => c.GetOpList(0 /* non-blocking */));
 
-        // Invoke user-provided callbacks.
         _dispatcher.Process(opList);
 
         nextFrameTime = nextFrameTime.AddMilliseconds(1000f / FramesPerSecond);

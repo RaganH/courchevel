@@ -46,7 +46,7 @@ namespace SharpWorker.simulation
           Constraint = new AndConstraint(
               new IConstraint[]
               {
-                new SphereConstraint(_currentPosition, 1000),
+                new SphereConstraint(_currentPosition, 200),
                 new ComponentConstraint(Mountain.ComponentId),
               }
             ),
