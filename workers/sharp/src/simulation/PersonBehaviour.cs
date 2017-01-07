@@ -21,6 +21,8 @@ namespace SharpWorker.simulation
     private Coordinates _currentPosition;
     private int _currentOre;
     private Destination _currentDestination;
+    //TODO(harry) - how do you dispose this?
+    private CancellationTokenSource _cancellationTokenSource;
 
     public PersonBehaviour(Dependencies deps, IComponentData<Person> initialData, EntityId entityId)
     {
@@ -29,6 +31,7 @@ namespace SharpWorker.simulation
       _entityId = entityId;
 
       _logger = Logger.WithName(_conn, typeof(PersonBehaviour).Name);
+      _cancellationTokenSource = new CancellationTokenSource();
 
       var data = initialData.Get().Value;
       _currentPosition = data.position;
@@ -42,20 +45,21 @@ namespace SharpWorker.simulation
       {
         if (_currentDestination == Destination.MOUNTAIN)
         {
-          FindMountain();
+          FindMountain(_cancellationTokenSource.Token);
         }
         else
         {
-          FindHome();
+          FindHome(_cancellationTokenSource.Token);
         }
       }
       else
       {
-        //TODO(harry) - stop background task here.
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource = new CancellationTokenSource();
       }
     }
 
-    private void FindMountain()
+    private void FindMountain(CancellationToken token)
     {
       var entityQuery = new EntityQuery
       {
@@ -68,10 +72,10 @@ namespace SharpWorker.simulation
         ),
         ResultType = new SnapshotResultType()
       };
-      _deps.QueryDispatcher.Send(entityQuery, o => Task.Run(() => MoveToMountain(o)));
+      _deps.QueryDispatcher.Send(entityQuery, o => Task.Run(() => MoveToMountain(o, token), token));
     }
 
-    private void MoveToMountain(EntityQueryResponseOp entityQueryResponseOp)
+    private void MoveToMountain(EntityQueryResponseOp entityQueryResponseOp, CancellationToken token)
     {
       var results = entityQueryResponseOp.Result;
       if (results.Any())
@@ -81,7 +85,7 @@ namespace SharpWorker.simulation
         {
           _logger.Warn($"Moving {_entityId} towards mountain");
 
-          MoveTo(target.First().Value.Get<Mountain>().Value.Get().Value.position);
+          MoveTo(token, target.First().Value.Get<Mountain>().Value.Get().Value.position);
 
           var componentUpdate = new Person.Update
           {
@@ -89,12 +93,12 @@ namespace SharpWorker.simulation
           };
           _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
 
-          FindHome();
+          FindHome(token);
         }
       }
     }
 
-    private void FindHome()
+    private void FindHome(CancellationToken token)
     {
       var entityQuery = new EntityQuery
       {
@@ -107,10 +111,10 @@ namespace SharpWorker.simulation
         ResultType = new SnapshotResultType()
       };
 
-      _deps.QueryDispatcher.Send(entityQuery, o => Task.Run(() => MoveToHome(o)));
+      _deps.QueryDispatcher.Send(entityQuery, o => Task.Run(() => MoveToHome(o, token), token));
     }
 
-    private void MoveToHome(EntityQueryResponseOp entityQueryResponseOp)
+    private void MoveToHome(EntityQueryResponseOp entityQueryResponseOp, CancellationToken token)
     {
       var results = entityQueryResponseOp.Result;
       if (results.Any())
@@ -120,7 +124,7 @@ namespace SharpWorker.simulation
         {
           _logger.Warn($"Moving {_entityId} towards house");
 
-          MoveTo(target.First().Value.Get<House>().Value.Get().Value.position);
+          MoveTo(token, target.First().Value.Get<House>().Value.Get().Value.position);
 
           var componentUpdate = new Person.Update
           {
@@ -128,7 +132,7 @@ namespace SharpWorker.simulation
           };
           _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
 
-          FindMountain();
+          FindMountain(token);
         }
       }
     }
@@ -154,11 +158,11 @@ namespace SharpWorker.simulation
       }
     }
 
-    private void MoveTo(Coordinates target)
+    private void MoveTo(CancellationToken token, Coordinates target)
     {
       int steps = 10;
       var originalPosition = _currentPosition;
-      for (int i = 1; i < steps; i ++)
+      for (int i = 1; i < steps && !token.IsCancellationRequested; i ++)
       {
         var newPosition = new Coordinates{
           X = Lerp(originalPosition.X, target.X, i, steps),
