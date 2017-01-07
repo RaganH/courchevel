@@ -4,16 +4,33 @@ type Wealth {
   int32 current = 1;
 }
 
+enum Destination {
+  MOUNTAIN = 0;
+  HOUSE = 1;
+}
+
 component Person {
 	id = 1234;
 
 	EntityPosition position = 1;
 
-	Wealth wealth = 2;
+	int32 ore = 2;
+
+	uint64 home_id = 3;
+
+	Destination destination = 4;
 }
 
 component Mountain {
 	id = 1235;
+
+	EntityPosition position = 1;
+
+	int32 ore = 2;
+}
+
+component House {
+	id = 1236;
 
 	EntityPosition position = 1;
 

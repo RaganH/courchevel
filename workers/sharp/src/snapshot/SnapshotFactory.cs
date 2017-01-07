@@ -28,11 +28,19 @@ namespace SharpWorker.snapshot
         currentEntityId++;
       }
 
-      var personGrid = PlaceInSquareGrid(5, 0);
+      var personGrid = PlaceInSquareGrid(2, 0);
+//      var personGrid = PlaceInSquareGrid(5, 0);
       foreach (var coord in personGrid)
       {
+        var houseEntity = new SnapshotEntity();
+        houseEntity.Add(new House.Data(coord, 0));
+        AssignToSharpWorker(houseEntity, House.ComponentId);
+
+        entities[new EntityId(currentEntityId)] = houseEntity;
+        currentEntityId++;
+
         var personEntity = new SnapshotEntity();
-        personEntity.Add(new Person.Data(coord, new Wealth(100)));
+        personEntity.Add(new Person.Data(coord, 0, (ulong)currentEntityId-1, Destination.MOUNTAIN));
         AssignToSharpWorker(personEntity, Person.ComponentId);
 
         entities[new EntityId(currentEntityId)] = personEntity;

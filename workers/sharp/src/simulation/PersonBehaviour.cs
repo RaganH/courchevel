@@ -16,11 +16,11 @@ namespace SharpWorker.simulation
     private readonly SerializedConnection _conn;
     private readonly EntityId _entityId;
     private readonly Logger _logger;
+    private readonly long _houseId;
 
     private Coordinates _currentPosition;
-    private int _currentWealth;
-    private Coordinates _target;
-    private ulong _callbackKey;
+    private int _currentOre;
+    private Destination _currentDestination;
 
     public PersonBehaviour(Dependencies deps, IComponentData<Person> initialData, EntityId entityId)
     {
@@ -31,38 +31,47 @@ namespace SharpWorker.simulation
       _logger = Logger.WithName(_conn, typeof(PersonBehaviour).Name);
 
       var data = initialData.Get().Value;
-      _currentWealth = data.wealth.current;
       _currentPosition = data.position;
-
-      _target = new Coordinates(0,0,0);
+      _currentDestination = data.destination;
+      _houseId = (long) data.homeId;
     }
 
     public void AuthorityChanged(bool hasAuthority)
     {
       if (hasAuthority)
       {
-        var entityQuery = new EntityQuery
+        if (_currentDestination == Destination.MOUNTAIN)
         {
-          Constraint = new AndConstraint(
-              new IConstraint[]
-              {
-                new SphereConstraint(_currentPosition, 200),
-                new ComponentConstraint(Mountain.ComponentId),
-              }
-            ),
-          ResultType = new SnapshotResultType()
-        };
-        _deps.QueryDispatcher.Send(entityQuery, MoveToNearbyMountain);
-
-        Task.Run(() => StartUpdatingWealth());
+          FindMountain();
+        }
+        else
+        {
+          FindHome();
+        }
       }
       else
       {
-        //TODO(harry) - stop bascground tasks here.
+        //TODO(harry) - stop background task here.
       }
     }
 
-    private void MoveToNearbyMountain(EntityQueryResponseOp entityQueryResponseOp)
+    private void FindMountain()
+    {
+      var entityQuery = new EntityQuery
+      {
+        Constraint = new AndConstraint(
+          new IConstraint[]
+          {
+            new SphereConstraint(_currentPosition, 200),
+            new ComponentConstraint(Mountain.ComponentId),
+          }
+        ),
+        ResultType = new SnapshotResultType()
+      };
+      _deps.QueryDispatcher.Send(entityQuery, o => Task.Run(() => MoveToMountain(o)));
+    }
+
+    private void MoveToMountain(EntityQueryResponseOp entityQueryResponseOp)
     {
       var results = entityQueryResponseOp.Result;
       if (results.Any())
@@ -71,18 +80,65 @@ namespace SharpWorker.simulation
         if (target.Any())
         {
           _logger.Warn($"Moving {_entityId} towards mountain");
-          _target = target.First().Value.Get<Mountain>().Value.Get().Value.position;
-          Task.Run(() => MoveToTarget());
+
+          MoveTo(target.First().Value.Get<Mountain>().Value.Get().Value.position);
+
+          var componentUpdate = new Person.Update
+          {
+            destination = Destination.HOUSE
+          };
+          _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
+
+          FindHome();
+        }
+      }
+    }
+
+    private void FindHome()
+    {
+      var entityQuery = new EntityQuery
+      {
+        Constraint = new AndConstraint(
+          new IConstraint[]
+          {
+            new EntityIdConstraint(new EntityId(_houseId)),
+          }
+        ),
+        ResultType = new SnapshotResultType()
+      };
+
+      _deps.QueryDispatcher.Send(entityQuery, o => Task.Run(() => MoveToHome(o)));
+    }
+
+    private void MoveToHome(EntityQueryResponseOp entityQueryResponseOp)
+    {
+      var results = entityQueryResponseOp.Result;
+      if (results.Any())
+      {
+        var target = results.Where(r => r.Value.Get<House>().HasValue).ToList();
+        if (target.Any())
+        {
+          _logger.Warn($"Moving {_entityId} towards house");
+
+          MoveTo(target.First().Value.Get<House>().Value.Get().Value.position);
+
+          var componentUpdate = new Person.Update
+          {
+            destination = Destination.MOUNTAIN
+          };
+          _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
+
+          FindMountain();
         }
       }
     }
 
     public void Update(IComponentUpdate<Person> componentUpdate)
     {
-      var wealthOption = componentUpdate.Get().wealth;
-      if (wealthOption.HasValue)
+      var oreOption = componentUpdate.Get().ore;
+      if (oreOption.HasValue)
       {
-        _currentWealth = wealthOption.Value.current;
+        _currentOre = oreOption.Value;
       }
 
       var positionOption = componentUpdate.Get().position;
@@ -90,18 +146,24 @@ namespace SharpWorker.simulation
       {
         _currentPosition = positionOption.Value;
       }
+
+      var destinationOption = componentUpdate.Get().destination;
+      if (destinationOption.HasValue)
+      {
+        _currentDestination = destinationOption.Value;
+      }
     }
 
-    private void MoveToTarget()
+    private void MoveTo(Coordinates target)
     {
-      int steps = 100;
+      int steps = 10;
       var originalPosition = _currentPosition;
       for (int i = 1; i < steps; i ++)
       {
         var newPosition = new Coordinates{
-          X = Lerp(originalPosition.X, _target.X, i, steps),
-          Y = Lerp(originalPosition.Y, _target.Y, i, steps),
-          Z = Lerp(originalPosition.Z, _target.Z, i, steps),
+          X = Lerp(originalPosition.X, target.X, i, steps),
+          Y = Lerp(originalPosition.Y, target.Y, i, steps),
+          Z = Lerp(originalPosition.Z, target.Z, i, steps),
         };
 
         var componentUpdate = new Person.Update
@@ -118,24 +180,6 @@ namespace SharpWorker.simulation
     private double Lerp(double original, double target, int currentStep, int steps)
     {
       return original + ((target - original) * (double)currentStep / steps);
-    }
-
-    private void StartUpdatingWealth()
-    {
-      while (true)
-      {
-        var componentUpdate = new Person.Update
-        {
-          wealth = new Wealth
-          {
-            current = _currentWealth+1,
-          }
-        };
-
-        _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
-
-        Thread.Sleep(1000);
-      }
     }
   }
 }
