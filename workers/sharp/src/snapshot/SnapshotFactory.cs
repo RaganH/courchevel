@@ -29,7 +29,6 @@ namespace SharpWorker.snapshot
       }
 
       var personGrid = PlaceInSquareGrid(2, 0);
-//      var personGrid = PlaceInSquareGrid(5, 0);
       foreach (var coord in personGrid)
       {
         var houseEntity = new SnapshotEntity();
@@ -40,7 +39,7 @@ namespace SharpWorker.snapshot
         currentEntityId++;
 
         var personEntity = new SnapshotEntity();
-        personEntity.Add(new Person.Data(coord, 0, (ulong)currentEntityId-1, Destination.MOUNTAIN));
+        personEntity.Add(new Person.Data(coord, (ulong)currentEntityId-1, Destination.MOUNTAIN, 0));
         AssignToSharpWorker(personEntity, Person.ComponentId);
 
         entities[new EntityId(currentEntityId)] = personEntity;

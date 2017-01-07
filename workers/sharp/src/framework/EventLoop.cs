@@ -105,19 +105,19 @@ namespace SharpWorker.framework
         IList<IComponentBehaviour> behaviour;
         if (_componentBehaviours.TryGetValue(o.EntityId, out behaviour))
         {
-          var componentBehvaiour = behaviour.FirstOrDefault(b => b is TBehaviour);
-          if (componentBehvaiour != null)
+          var componentBehaviour = behaviour.FirstOrDefault(b => b is TBehaviour);
+          if (componentBehaviour != null)
           {
-            ((TBehaviour)componentBehvaiour).Update(o.Update);
+            ((TBehaviour)componentBehaviour).Update(o.Update);
           }
           else
           {
-            _logger.Warn($"Received AuthorityChanged on entity {o.EntityId} for unknown component {componentId}");
+            _logger.Warn($"Received component update on entity {o.EntityId} for unknown component {componentId}");
           }
         }
         else
         {
-          _logger.Warn($"Received AuthorityChanged for component {componentId} on unknown entity {o.EntityId}");
+          _logger.Warn($"Received component update for component {componentId} on unknown entity {o.EntityId}");
         }
       });
     }
@@ -146,6 +146,34 @@ namespace SharpWorker.framework
         var waitFor = nextFrameTime.Subtract(DateTime.Now);
         Thread.Sleep(waitFor.Milliseconds > 0 ? waitFor : TimeSpan.Zero);
       }
+    }
+
+    public void RegisterCommandHandler<TCommand, TBehaviour>() where TCommand : ICommandMetaclass, new()
+    {
+      _dispatcher.OnCommandRequest<TCommand>(o =>
+            {
+              IList<IComponentBehaviour> behaviour;
+              if (_componentBehaviours.TryGetValue(o.EntityId, out behaviour))
+              {
+                var componentBehaviour = behaviour.FirstOrDefault(b => b is TBehaviour);
+                if (componentBehaviour != null)
+                {
+                  var handler = componentBehaviour as ICommandHandler<TCommand>;
+                  if (handler != null)
+                  {
+                    handler.DoCommand(o);
+                  }
+                }
+                else
+                {
+                  _logger.Warn($"Received command on entity {o.EntityId} for unknown component");
+                }
+              }
+              else
+              {
+                _logger.Warn($"Received command for unknown entity {o.EntityId}");
+              }
+            });
     }
   }
 }

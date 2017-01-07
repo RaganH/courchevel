@@ -39,6 +39,28 @@ namespace SharpWorker.simulation
       _houseId = (long) data.homeId;
     }
 
+    public void Update(IComponentUpdate<Person> componentUpdate)
+    {
+      var oreOption = componentUpdate.Get().ore;
+      if (oreOption.HasValue)
+      {
+        _currentOre = oreOption.Value;
+      }
+
+      var positionOption = componentUpdate.Get().position;
+      if (positionOption.HasValue)
+      {
+        _currentPosition = positionOption.Value;
+      }
+
+      var destinationOption = componentUpdate.Get().destination;
+      if (destinationOption.HasValue)
+      {
+        _currentDestination = destinationOption.Value;
+      }
+    }
+
+
     public void AuthorityChanged(bool hasAuthority)
     {
       if (hasAuthority)
@@ -85,17 +107,29 @@ namespace SharpWorker.simulation
         {
           _logger.Warn($"Moving {_entityId} towards mountain");
 
-          MoveTo(token, target.First().Value.Get<Mountain>().Value.Get().Value.position);
+          var mountain = target.First().Value.Get<Mountain>();
+          MoveTo(token, mountain.Value.Get().Value.position);
 
-          var componentUpdate = new Person.Update
-          {
-            destination = Destination.HOUSE
-          };
-          _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
-
-          FindHome(token);
+          var mineRequest = new Mountain.Commands.Mine.Request(10);
+          _deps.QueryDispatcher.SendCommand(target.First().Key, mineRequest, op => ReceiveOre(token, op, 10));
         }
       }
+    }
+
+    private void ReceiveOre(CancellationToken token, CommandResponseOp<Mountain.Commands.Mine> op, int minedOre)
+    {
+      if (op.StatusCode == StatusCode.Success)
+      {
+        _logger.Warn($"Entity {_entityId} mined {minedOre} ore");
+        var componentUpdate = new Person.Update
+        {
+          ore = _currentOre + minedOre,
+          destination = Destination.HOUSE
+        };
+        _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
+      }
+
+      FindHome(token);
     }
 
     private void FindHome(CancellationToken token)
@@ -134,27 +168,6 @@ namespace SharpWorker.simulation
 
           FindMountain(token);
         }
-      }
-    }
-
-    public void Update(IComponentUpdate<Person> componentUpdate)
-    {
-      var oreOption = componentUpdate.Get().ore;
-      if (oreOption.HasValue)
-      {
-        _currentOre = oreOption.Value;
-      }
-
-      var positionOption = componentUpdate.Get().position;
-      if (positionOption.HasValue)
-      {
-        _currentPosition = positionOption.Value;
-      }
-
-      var destinationOption = componentUpdate.Get().destination;
-      if (destinationOption.HasValue)
-      {
-        _currentDestination = destinationOption.Value;
       }
     }
 

@@ -1,0 +1,52 @@
+package ragan;
+
+enum Destination {
+  MOUNTAIN = 0;
+  HOUSE = 1;
+}
+
+component Person {
+	id = 1234;
+
+	EntityPosition position = 1;
+
+	uint64 home_id = 2;
+
+	Destination destination = 3;
+
+	int32 ore = 4;
+}
+
+component Mountain {
+	id = 1235;
+
+	EntityPosition position = 1;
+
+	int32 ore = 2;
+
+	command MineRequest mine returns MineResponse;
+}
+
+component House {
+	id = 1236;
+
+	EntityPosition position = 1;
+
+	int32 ore = 2;
+
+	command DepositRequest deposit returns DepositResponse;
+}
+
+
+type MineRequest {
+  uint32 amount = 1;
+}
+
+type MineResponse {}
+
+
+type DepositRequest {
+  uint32 amount = 1;
+}
+
+type DepositResponse {}

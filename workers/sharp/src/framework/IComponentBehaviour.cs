@@ -10,4 +10,9 @@ namespace SharpWorker.framework
     void AuthorityChanged(bool hasAuthority);
     void Update(IComponentUpdate<T> componentUpdate);
   }
+
+  public interface ICommandHandler<TCommand> where TCommand : ICommandMetaclass
+  {
+    void DoCommand(CommandRequestOp<TCommand> request);
+  }
 }

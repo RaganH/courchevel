@@ -45,6 +45,7 @@ namespace SharpWorker
         {
           eventLoop.Register<Person, PersonBehaviour>((deps, data, id) => new PersonBehaviour(deps, data, id));
           eventLoop.Register<Mountain, MountainBehaviour>((deps, data, id) => new MountainBehaviour(deps, data, id));
+          eventLoop.RegisterCommandHandler<Mountain.Commands.Mine, MountainBehaviour>();
         }
         catch (Exception e)
         {
