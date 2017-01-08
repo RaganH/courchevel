@@ -1,7 +1,6 @@
 Features
 ==================
 
-Change movement so people move at constant speed
 
 Refactoring
 ==================

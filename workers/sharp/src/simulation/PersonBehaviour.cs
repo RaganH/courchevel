@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Improbable;
@@ -13,6 +14,7 @@ namespace SharpWorker.simulation
   class PersonBehaviour : IComponentBehaviour<Person>
   {
     private const int OrePerMine = 10;
+    private const double MovementSpeedMetresPerSecond = 10;
 
     private readonly Dependencies _deps;
     private readonly SerializedConnection _conn;
@@ -185,30 +187,40 @@ namespace SharpWorker.simulation
 
     private void MoveTo(CancellationToken token, Coordinates target)
     {
-      int steps = 10;
       var originalPosition = _currentPosition;
-      for (int i = 1; i < steps && !token.IsCancellationRequested; i ++)
+
+      var direction = target - _currentPosition;
+      var distance = Math.Sqrt(direction.SquareMagnitude());
+      var unitDirection = direction / distance;
+
+      var steps = Math.Floor(distance / MovementSpeedMetresPerSecond);
+
+      for (int i = 1; i < steps; i++)
       {
-        var newPosition = new Coordinates{
-          X = Lerp(originalPosition.X, target.X, i, steps),
-          Y = Lerp(originalPosition.Y, target.Y, i, steps),
-          Z = Lerp(originalPosition.Z, target.Z, i, steps),
-        };
+        var newPosition = originalPosition + unitDirection * (i * MovementSpeedMetresPerSecond);
 
         var componentUpdate = new Person.Update
         {
           position = newPosition
         };
-
         _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
 
-        Thread.Sleep(500);
+        try
+        {
+          Task.Delay(500, token).Wait(token);
+        }
+        catch (Exception e)
+        {
+          // Task cancelled
+          return;
+        }
       }
-    }
 
-    private double Lerp(double original, double target, int currentStep, int steps)
-    {
-      return original + ((target - original) * (double)currentStep / steps);
+      var finalUpdate = new Person.Update
+      {
+        position = target
+      };
+      _conn.Do(c => c.SendComponentUpdate(_entityId, finalUpdate));
     }
   }
 }
