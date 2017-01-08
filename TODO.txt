@@ -7,6 +7,5 @@ Change movement so people move at constant speed
 Refactoring
 ==================
 
-Make command subscriptions generic
 Avoid having to store all the entity data manually (Remove update methods)
 Error handling so failed commands don't stop the person from being simulated. 

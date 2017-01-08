@@ -19,8 +19,6 @@ namespace SharpWorker.framework
 
     private readonly Dictionary<EntityId, IList<IComponentBehaviour>> _componentBehaviours;
 
-    private long _frame;
-
     public static EventLoop Connect(string workerId, string receptionistIp, string receptionistPort)
     {
       var parameters = new ConnectionParameters
@@ -131,12 +129,43 @@ namespace SharpWorker.framework
       });
     }
 
+    public void RegisterCommandHandler<TCommand, TBehaviour>() where TCommand : ICommandMetaclass, new()
+    {
+      _dispatcher.OnCommandRequest<TCommand>(o =>
+        {
+          IList<IComponentBehaviour> behaviour;
+          if (_componentBehaviours.TryGetValue(o.EntityId, out behaviour))
+          {
+            var componentBehaviour = behaviour.FirstOrDefault(b => b is TBehaviour);
+            if (componentBehaviour != null)
+            {
+              var handler = componentBehaviour as ICommandHandler<TCommand>;
+              if (handler != null)
+              {
+                handler.DoCommand(o);
+              }
+              else
+              {
+                _logger.Warn($"Behaviour {typeof(TBehaviour).Name} on entity {o.EntityId} for unknown component");
+              }
+            }
+            else
+            {
+              _logger.Warn($"Received command on entity {o.EntityId} for unknown component");
+            }
+          }
+          else
+          {
+            _logger.Warn($"Received command for unknown entity {o.EntityId}");
+          }
+        });
+    }
+
     public void Run()
     {
       var nextFrameTime = DateTime.Now;
       while (true)
       {
-        _frame++;
 
         var opList = _serializedConnection.Do(c => c.GetOpList(0 /* non-blocking */));
 
@@ -146,34 +175,6 @@ namespace SharpWorker.framework
         var waitFor = nextFrameTime.Subtract(DateTime.Now);
         Thread.Sleep(waitFor.Milliseconds > 0 ? waitFor : TimeSpan.Zero);
       }
-    }
-
-    public void RegisterCommandHandler<TCommand, TBehaviour>() where TCommand : ICommandMetaclass, new()
-    {
-      _dispatcher.OnCommandRequest<TCommand>(o =>
-            {
-              IList<IComponentBehaviour> behaviour;
-              if (_componentBehaviours.TryGetValue(o.EntityId, out behaviour))
-              {
-                var componentBehaviour = behaviour.FirstOrDefault(b => b is TBehaviour);
-                if (componentBehaviour != null)
-                {
-                  var handler = componentBehaviour as ICommandHandler<TCommand>;
-                  if (handler != null)
-                  {
-                    handler.DoCommand(o);
-                  }
-                }
-                else
-                {
-                  _logger.Warn($"Received command on entity {o.EntityId} for unknown component");
-                }
-              }
-              else
-              {
-                _logger.Warn($"Received command for unknown entity {o.EntityId}");
-              }
-            });
     }
   }
 }

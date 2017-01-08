@@ -3,45 +3,62 @@ using System.Collections.Concurrent;
 using Improbable;
 using Improbable.Worker;
 using Improbable.Worker.Query;
-using Ragan;
 
 namespace SharpWorker.framework
 {
   public class QueryDispatcher
   {
-    private const int _defaultTimeoutMillis = 5000;
+    private const int DefaultTimeoutMillis = 5000;
 
+    private readonly Dispatcher _dispatcher;
     private readonly SerializedConnection _conn;
     private readonly Logger _logger;
 
     private readonly ConcurrentDictionary<uint, Action<EntityQueryResponseOp>> _entityQueryCallbacks;
-    private readonly ConcurrentDictionary<uint, Action<CommandResponseOp<Mountain.Commands.Mine>>> _commandCallbacks;
+    private readonly ConcurrentDictionary<uint, Action<object>> _commandCallbacks;
+    private readonly ConcurrentDictionary<Type, bool> _susbscribed;
 
     public QueryDispatcher(Dispatcher dispatcher, SerializedConnection conn)
     {
+      _dispatcher = dispatcher;
       _conn = conn;
       _logger = Logger.WithName(conn, typeof(QueryDispatcher).Name);
+
+      _susbscribed = new ConcurrentDictionary<Type, bool>();
       _entityQueryCallbacks = new ConcurrentDictionary<uint, Action<EntityQueryResponseOp>>();
-      _commandCallbacks = new ConcurrentDictionary<uint, Action<CommandResponseOp<Mountain.Commands.Mine>>>();
+      _commandCallbacks = new ConcurrentDictionary<uint, Action<object>>();
 
       dispatcher.OnEntityQueryResponse(DispatchQueryResponse);
-      // TODO(harry) remove hard coded type
-      dispatcher.OnCommandResponse<Mountain.Commands.Mine>(DispatchCommandResponse);
     }
 
     public void Send(EntityQuery query, Action<EntityQueryResponseOp> responseCallback)
     {
-      var id = _conn.Do(c => c.SendEntityQueryRequest(query, _defaultTimeoutMillis));
+      var id = _conn.Do(c => c.SendEntityQueryRequest(query, DefaultTimeoutMillis));
       _entityQueryCallbacks.TryAdd(id.Id, responseCallback);
     }
 
-    public void SendCommand(EntityId entityId, ICommandRequest<Mountain.Commands.Mine> commandRequest, Action<CommandResponseOp<Mountain.Commands.Mine>> responseCallback)
+    public void SendCommand<T>(EntityId entityId, ICommandRequest<T> commandRequest, Action<CommandResponseOp<T>> responseCallback)
+      where T : ICommandMetaclass, new()
     {
-      var id = _conn.Do(c => c.SendCommandRequest(entityId, commandRequest, _defaultTimeoutMillis));
-      _commandCallbacks.TryAdd(id.Id, responseCallback);
+      if (_susbscribed.TryAdd(typeof(T), true))
+      {
+        _dispatcher.OnCommandResponse<T>(DispatchCommandResponse);
+      }
+      var id = _conn.Do(c => c.SendCommandRequest(entityId, commandRequest, DefaultTimeoutMillis));
+      _commandCallbacks.TryAdd(id.Id, o =>
+      {
+        if (o is CommandResponseOp<T>)
+        {
+          responseCallback((CommandResponseOp<T>) o);
+        }
+        else
+        {
+          _logger.Warn($"Command callback expects wrong type. Have type {typeof(T).Name} but callback was: {o.GetType()}");
+        }
+      });
     }
 
-    private void DispatchCommandResponse(CommandResponseOp<Mountain.Commands.Mine> op)
+    private void DispatchCommandResponse<T>(CommandResponseOp<T> op) where T : ICommandMetaclass
     {
       if (op.StatusCode != StatusCode.Success)
       {
@@ -49,7 +66,7 @@ namespace SharpWorker.framework
         return;
       }
 
-      Action<CommandResponseOp<Mountain.Commands.Mine>> callback;
+      Action<object> callback;
       if (!_commandCallbacks.TryGetValue(op.RequestId.Id, out callback))
       {
         _logger.Warn($"No response callback for EntityQuery {op.RequestId.Id}");
