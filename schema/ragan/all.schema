@@ -39,14 +39,14 @@ component House {
 
 
 type MineRequest {
-  uint32 amount = 1;
+  int32 amount = 1;
 }
 
 type MineResponse {}
 
 
 type DepositRequest {
-  uint32 amount = 1;
+  int32 amount = 1;
 }
 
 type DepositResponse {}

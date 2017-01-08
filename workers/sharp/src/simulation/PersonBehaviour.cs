@@ -12,6 +12,8 @@ namespace SharpWorker.simulation
 {
   class PersonBehaviour : IComponentBehaviour<Person>
   {
+    private const int OrePerMine = 10;
+
     private readonly Dependencies _deps;
     private readonly SerializedConnection _conn;
     private readonly EntityId _entityId;
@@ -59,7 +61,6 @@ namespace SharpWorker.simulation
         _currentDestination = destinationOption.Value;
       }
     }
-
 
     public void AuthorityChanged(bool hasAuthority)
     {
@@ -110,8 +111,8 @@ namespace SharpWorker.simulation
           var mountain = target.First().Value.Get<Mountain>();
           MoveTo(token, mountain.Value.Get().Value.position);
 
-          var mineRequest = new Mountain.Commands.Mine.Request(10);
-          _deps.QueryDispatcher.SendCommand(target.First().Key, mineRequest, op => ReceiveOre(token, op, 10));
+          var mineRequest = new Mountain.Commands.Mine.Request(OrePerMine);
+          _deps.QueryDispatcher.SendCommand(target.First().Key, mineRequest, op => ReceiveOre(token, op, OrePerMine));
         }
       }
     }
@@ -160,15 +161,26 @@ namespace SharpWorker.simulation
 
           MoveTo(token, target.First().Value.Get<House>().Value.Get().Value.position);
 
-          var componentUpdate = new Person.Update
-          {
-            destination = Destination.MOUNTAIN
-          };
-          _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
-
-          FindMountain(token);
+          var depositRequest = new House.Commands.Deposit.Request(_currentOre);
+          _deps.QueryDispatcher.SendCommand(target.First().Key, depositRequest, op => DepositOre(token, op, _currentOre));
         }
       }
+    }
+
+    private void DepositOre(CancellationToken token, CommandResponseOp<House.Commands.Deposit> op, int depositedOre)
+    {
+      if (op.StatusCode == StatusCode.Success)
+      {
+        _logger.Warn($"Entity {_entityId} deposited {depositedOre} ore");
+        var componentUpdate = new Person.Update
+        {
+          ore = _currentOre - depositedOre,
+          destination = Destination.MOUNTAIN
+        };
+        _conn.Do(c => c.SendComponentUpdate(_entityId, componentUpdate));
+      }
+
+      FindMountain(token);
     }
 
     private void MoveTo(CancellationToken token, Coordinates target)

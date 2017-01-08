@@ -20,7 +20,10 @@ namespace SharpWorker.snapshot
       var mountainGrid = PlaceInSquareGrid(3, 0);
       foreach (var coord in mountainGrid)
       {
-        var mountainEntity = new SnapshotEntity();
+        var mountainEntity = new SnapshotEntity
+        {
+          Prefab = "Mountain"
+        };
         mountainEntity.Add(new Mountain.Data(coord, 500));
         AssignToSharpWorker(mountainEntity, Mountain.ComponentId);
 
@@ -31,14 +34,20 @@ namespace SharpWorker.snapshot
       var personGrid = PlaceInSquareGrid(2, 0);
       foreach (var coord in personGrid)
       {
-        var houseEntity = new SnapshotEntity();
+        var houseEntity = new SnapshotEntity
+        {
+          Prefab = "House"
+        };
         houseEntity.Add(new House.Data(coord, 0));
         AssignToSharpWorker(houseEntity, House.ComponentId);
 
         entities[new EntityId(currentEntityId)] = houseEntity;
         currentEntityId++;
 
-        var personEntity = new SnapshotEntity();
+        var personEntity = new SnapshotEntity
+        {
+          Prefab = "Person"
+        };
         personEntity.Add(new Person.Data(coord, (ulong)currentEntityId-1, Destination.MOUNTAIN, 0));
         AssignToSharpWorker(personEntity, Person.ComponentId);
 

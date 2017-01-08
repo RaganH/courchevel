@@ -1,7 +1,6 @@
 Features
 ==================
 
-Add depositing the ore at houses
 Change movement so people move at constant speed
 
 Refactoring

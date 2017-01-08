@@ -25,6 +25,7 @@
     <Compile Include="src\framework\Logger.cs" />
     <Compile Include="src\framework\QueryDispatcher.cs" />
     <Compile Include="src\framework\SerializedConnection.cs" />
+    <Compile Include="src\simulation\HouseBehaviour.cs" />
     <Compile Include="src\simulation\MountainBehaviour.cs" />
     <Compile Include="src\simulation\PersonBehaviour.cs" />
     <Compile Include="src\snapshot\SnapshotFactory.cs" />
