@@ -1,8 +1,8 @@
 {
     "name": "gamingsuccess",
     "project_version": "0.0.1",
-    "sdk_version": "9.0.3",
+    "sdk_version": "9.1.1",
     "dependencies": [
-	{ "name": "WorkerSdkSchema", "version": "9.0.3" }
+	    { "name": "WorkerSdkSchema", "version": "9.1.1" }
     ]
 }

@@ -29,7 +29,7 @@
     "macos": {
       "artifact_name": "SharpWorker@Mac.zip",
       "command": "mono",
-      "arguments": ["SharpWorker.exe", "${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
+      "arguments": ["--arch=64", "SharpWorker.exe", "${IMPROBABLE_WORKER_ID}", "${IMPROBABLE_RECEPTIONIST_IP}", "${IMPROBABLE_RECEPTIONIST_PORT}"]
      },
     "linux": {
       "artifact_name": "SharpWorker@Linux.zip",
