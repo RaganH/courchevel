@@ -1,7 +1,9 @@
+using System;
 using Improbable;
 using Improbable.Worker;
 using Ragan;
 using SharpWorker.framework;
+using Improbable.Math;
 
 namespace SharpWorker.simulation
 {
@@ -19,7 +21,15 @@ namespace SharpWorker.simulation
       _currentOre = data.Get().Value.ore;
     }
 
-    public void AuthorityChanged(bool hasAuthority) { }
+      public void AuthorityChanged(bool hasAuthority)
+      {
+          if (hasAuthority)
+          {
+              Entity entity = new Entity();
+              entity.Add<House>(new House.Data(new Coordinates(1, 2, 3), 200));
+              _deps.Connection.Do(c => c.SendCreateEntityRequest(entity, "SpawnedHouse", null, null));
+          }
+      }
 
     public void Update(IComponentUpdate<House> componentUpdate)
     {

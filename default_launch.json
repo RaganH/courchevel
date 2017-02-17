@@ -33,9 +33,20 @@
                 }
             },
             "permissions": [
-                {
-                    "all": {}
+              {
+                "entity_creation": {
+                    "allow": true
+                },
+                "entity_deletion": {
+                    "allow": true
+                },
+                "entity_query": {
+                    "allow": true,
+                    "components": [
+                        "*"
+                    ]
                 }
+              }
             ]
         }
     ]

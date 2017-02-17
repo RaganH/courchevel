@@ -24,7 +24,7 @@ component Mountain {
 
 	int32 ore = 2;
 
-	command MineRequest mine returns MineResponse;
+	command MineResponse mine(MineRequest);
 }
 
 component House {
@@ -34,7 +34,7 @@ component House {
 
 	int32 ore = 2;
 
-	command DepositRequest deposit returns DepositResponse;
+	command DepositResponse deposit(DepositRequest);
 }
 
 
