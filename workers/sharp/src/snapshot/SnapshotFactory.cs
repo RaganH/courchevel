@@ -67,16 +67,16 @@ namespace SharpWorker.snapshot
 
     private static void AssignToSharpWorker(SnapshotEntity entity, uint componentId)
     {
-      var workerPredicate = new WorkerPredicate(new Improbable.Collections.List<WorkerClaim>
+      var workerRequirementSet = new WorkerRequirementSet(new Improbable.Collections.List<WorkerAttributeSet>
       {
-        new WorkerClaim(new Improbable.Collections.List<WorkerClaimAtom>
+        new WorkerAttributeSet(new Improbable.Collections.List<WorkerAttribute>
         {
-          new WorkerClaimAtom("sharp")
+          new WorkerAttribute(new Option<string>("sharp"))
         }),
       });
-      entity.Add(new EntityAcl.Data(workerPredicate, new ComponentAcl(new Map<uint, WorkerPredicate>
+      entity.Add(new EntityAcl.Data(workerRequirementSet, new ComponentAcl(new Map<uint, WorkerRequirementSet>
       {
-        {componentId, workerPredicate}
+        {componentId, workerRequirementSet}
       })));
     }
 

@@ -1,11 +1,11 @@
 {
   "build": {
-    "tasks_filename": "build.json",
+    "tasks_filename": "spatialos.csharp.build.json",
     "generated_build_scripts_type": "csharp"
   },
   "bridge": {
-    "worker_claim": {
-      "claims": [
+    "workerAttributeSet": {
+      "attributes": [
         "sharp"
       ]
     },

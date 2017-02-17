@@ -1,8 +1,8 @@
 {
-    "name": "gamingsuccess",
+    "name": "gamex",
     "project_version": "0.0.1",
-    "sdk_version": "9.1.1",
+    "sdk_version": "10.0.0-rc-03",
     "dependencies": [
-	    { "name": "WorkerSdkSchema", "version": "9.1.1" }
+	    { "name": "WorkerSdkSchema", "version": "10.0.0-rc-03" }
     ]
 }

@@ -3,3 +3,4 @@ spatialos_worker_packages.json
 build/
 .idea
 logs/
+.improbable/
